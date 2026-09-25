@@ -47,7 +47,7 @@ dedup4j:
 ## Amazon S3
 
 Also works with S3-compatible stores — MinIO, Cloudflare R2, Backblaze B2 —
-via `endpoint-override`.
+via `endpoint`.
 
 ```yaml
 dedup4j:
@@ -62,8 +62,8 @@ dedup4j:
 |---|---|
 | `bucket` | Target bucket. Must already exist |
 | `region` | AWS region |
-| `endpoint-override` | Custom endpoint for S3-compatible stores |
-| `path-style-access` | `true` for MinIO and most S3-compatible stores |
+| `endpoint` | Custom endpoint for S3-compatible stores |
+| `path-style` | `true` for MinIO and most S3-compatible stores |
 
 ### Credentials
 
@@ -96,11 +96,11 @@ dedup4j:
     s3:
       bucket: blobs
       region: us-east-1
-      endpoint-override: http://localhost:9000
-      path-style-access: true
+      endpoint: http://localhost:9000
+      path-style: true
 ```
 
-`path-style-access: true` is required by most S3-compatible stores, which do
+`path-style: true` is required by most S3-compatible stores, which do
 not implement virtual-host-style bucket addressing.
 
 ## Azure Blob Storage
