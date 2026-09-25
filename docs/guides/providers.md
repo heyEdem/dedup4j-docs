@@ -37,11 +37,12 @@ dedup4j:
 |---|---|
 | `root-directory` | Directory holding stored blobs |
 
-!!! warning "Single-node only"
-    Two application instances with separate filesystems will deduplicate
-    against different content. The database says the bytes exist; the local
-    disk of the node handling the request may disagree. Use object storage for
-    anything multi-node.
+!!! warning "Intended for a single node"
+    Nothing in the adapter prevents multi-node use, but two instances with
+    separate filesystems share one database and two different sets of bytes.
+    The database can say content exists while the disk of the node handling
+    the request does not have it. Use object storage for anything multi-node,
+    or give every node the same shared mount.
 
 ## Amazon S3
 

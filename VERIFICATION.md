@@ -80,6 +80,9 @@ page is wrong and must change — not the other way round.
 | C11 | Ten artifacts publish to Central; `dedup4j-dashboard` does not | Installation | release runbook artifact manifest | ✅ matches manifest |
 | C12 | Built and tested against Spring Boot 4.1.1 | Home, Installation | root POM `spring-boot.version` | ✅ verified |
 | C13 | Java 21 or later | Home, Installation | root POM `java.version` | ✅ verified |
+| C31 | Hash algorithm is SHA-256 | Uploading | `Sha256ContentHasher` | ✅ verified |
+| C32 | `max-upload-size` defaults to 25 MB and is enforced | Uploading | `DefaultDedup4j` | ✅ verified |
+| C33 | `ReconciliationService` needs manual construction | Lifecycle | no auto-configuration | ✅ verified |
 | C14 | Final `release` deletes the object immediately, in-transaction | Quick start §6, Lifecycle | `ReferenceCountService.release` → `storage.delete` at zero | ✅ verified — **docs were wrong, corrected** |
 | C15 | A duplicate `store` **increments** the reference count | Uploading, Lifecycle, Quick start | `DefaultBlobDeduplicationService.store` → `retainDuplicate` → `retain` | ✅ verified — **docs were wrong, corrected** |
 | C16 | New content is created at `refCount = 1` | Uploading, Lifecycle | `AssetContent.refCount = 1L` | ✅ verified |
@@ -95,8 +98,26 @@ page is wrong and must change — not the other way round.
 | C26 | Standalone dashboard binds `127.0.0.1`, no auth | Observability | `DEFAULT_ADDRESS`, `application.yaml` | ✅ verified |
 | C27 | S3 adapter exposes no credentials property | Providers | `S3BlobStorageProperties` has no credential fields | ✅ verified |
 | C28 | `BlobStorage` SPI is four methods | Providers | `dedup4j-core/.../BlobStorage.java` | ✅ verified |
-| C29 | Local provider is single-node only | Providers | design claim, not code-enforced | ⬜ reasoned, not proven |
+| C29 | Local provider is intended for a single node | Providers | not code-enforced; page reworded to match this hedge | ✅ page matches evidence |
 | C30 | `storeAll` is partial-success with a sealed outcome type | Uploading | `BatchStoreOutcome` sealed interface | ✅ verified |
+
+## C-bis. Library findings surfaced by writing the docs
+
+Not documentation bugs — library observations that writing the pages exposed.
+Each is a decision for the maintainer, not something the site can fix.
+
+| # | Finding | Evidence | Suggested action |
+|---|---|---|---|
+| F1 | `dedup4j.cleanup.*` is bound but **never read**. `delete-physical-on-zero-references` disables nothing; deletion at zero is unconditional | zero main-code readers of `getCleanup()` | wire it, or drop the properties before `0.1.0` freezes them |
+| F2 | `dedup4j.deduplication.hash-algorithm` is bound but ignored — `contentHasher()` returns `new Sha256ContentHasher()` unconditionally | `Dedup4jServiceAutoConfiguration` | honour it, or remove it and document SHA-256 as fixed |
+| F3 | `dedup4j.deduplication.strict-content-type-validation` has no main-code reader | grep | same as F1 |
+| F4 | `ReconciliationService` is **not auto-configured** — no `@Bean` anywhere | no `new ReconciliationService` in main | add a conditional bean, or document manual construction (docs currently do the latter) |
+| F5 | `max-upload-size` defaults to 25 MB and content is read fully into memory to hash | `DefaultDedup4j` line 113 | fine, but the memory cost should be stated in the docs |
+
+> [!IMPORTANT]
+> F1–F3 are **configuration properties that do nothing**. Published in `0.1.0`
+> they become a permanent contract that the library does not honour. Removing
+> them after publication is a breaking change; removing them now costs nothing.
 
 ## D. Acceptance gates
 

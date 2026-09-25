@@ -22,6 +22,11 @@ Four `store` overloads for the four shapes bytes usually arrive in — a web
 upload, a file on disk, an in-memory array, or a stream you are already
 holding.
 
+!!! warning "Uploads are capped at 25 MB by default"
+    `dedup4j.deduplication.max-upload-size` defaults to `25MB` and **is**
+    enforced. Larger uploads are rejected. Raise it deliberately — the content
+    is read into memory to be hashed.
+
 !!! note "The stream overload needs the size up front"
     `sizeBytes` is a parameter because content length is part of content
     identity and dedup4j will not buffer an entire stream to discover it.
@@ -51,9 +56,14 @@ building your own download URLs via
 public record ContentHash(String algorithm, String hash, long sizeBytes) {}
 ```
 
-Identity is the **triple**, not the hash alone. Size participates, so two
-objects match only if the digest *and* the byte count agree — a cheap defence
-that makes an accidental collision require matching both.
+Identity is the **triple**, not the hash alone. The digest is SHA-256, which
+is where collision resistance actually comes from; size is an additional
+discriminator, so two objects match only if both agree.
+
+!!! note "The algorithm is fixed"
+    `dedup4j.deduplication.hash-algorithm` binds and defaults to `SHA-256`, but
+    the library constructs a SHA-256 hasher unconditionally. Setting it to
+    anything else changes nothing today.
 
 What identity is **not**:
 
