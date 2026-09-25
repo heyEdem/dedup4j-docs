@@ -1,4 +1,4 @@
-# Blob Helper
+# dedup4j
 
 Store identical bytes once — deduplicated blob storage for Spring Boot, backed
 by your own database and object store.
@@ -20,7 +20,7 @@ by your own database and object store.
 [Quick start](getting-started/quick-start.md){ .md-button .md-button--primary }
 [Installation](getting-started/installation.md){ .md-button }
 
-!!! warning "Two things Blob Helper does not do"
+!!! warning "Two things dedup4j does not do"
     It does not generate presigned URLs, and it cannot make the database write
     and the object-store write atomic. See
     [Retrieval, retain & release](guides/lifecycle.md) and
@@ -28,7 +28,7 @@ by your own database and object store.
 
 [Storage providers](guides/providers.md) ·
 [Architecture & limitations](architecture.md) ·
-[Source](https://github.com/heyEdem/blob-helper)
+[Source](https://github.com/heyEdem/dedup4j)
 
 !!! note "Landing page not yet complete"
     The value sentence, compatibility line, dependency path, and warning above

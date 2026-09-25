@@ -1,8 +1,9 @@
-# Blob Helper documentation site.
+# dedup4j documentation site.
 # Design: docs/plans/2026-09-01-blob-helper-docs-design.md
 # Scope:  docs/plans/2026-09-24-docs-site-and-release-alignment.md
+# Rename:  docs/plans/2026-09-25-library-rename-to-dedup4j.md
 
-site_name: Blob Helper
+site_name: dedup4j
 site_description: >-
   Store identical bytes once — deduplicated blob storage for Spring Boot,
   backed by your own database and object store.
@@ -11,9 +12,9 @@ site_author: Edem
 # PROVISIONAL. The public repository name and the Pages URL are open questions
 # in the design (§11) and are resolved in release gate G0. Changing this is a
 # one-line edit; nothing else in the site hardcodes the host.
-site_url: https://heyEdem.github.io/blob-helper-docs/
-repo_url: https://github.com/heyEdem/blob-helper
-repo_name: heyEdem/blob-helper
+site_url: https://heyEdem.github.io/dedup4j-docs/
+repo_url: https://github.com/heyEdem/dedup4j
+repo_name: heyEdem/dedup4j
 edit_uri: ""
 
 theme:

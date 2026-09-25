@@ -1,11 +1,11 @@
-# Blob Helper documentation
+# dedup4j documentation
 
-Source for the Blob Helper documentation site, built with
+Source for the dedup4j documentation site, built with
 [MkDocs](https://www.mkdocs.org/) and
 [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) and
 deployed to GitHub Pages by GitHub Actions.
 
-The library itself lives at [heyEdem/blob-helper](https://github.com/heyEdem/blob-helper).
+The library itself lives at [heyEdem/dedup4j](https://github.com/heyEdem/dedup4j).
 
 ## Local development
 
