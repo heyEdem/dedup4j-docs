@@ -1,0 +1,112 @@
+# Post-Rename Verification
+
+**Purpose:** every claim this documentation site makes about dedup4j that
+depends on the library rename landing correctly. The docs were written against
+the *agreed* names while `../blob-helper` was still being renamed, so this file
+is the reconciliation between the two.
+
+**Read this as:** the docs are currently ahead of the library. That is
+deliberate (decision D3 — documentation ships before the release), but it means
+nothing here is true until verified.
+
+**Last reconciled:** 2026-09-25
+**Library HEAD at reconciliation:** `94abdd3 refactor(dashboard): rename module to dedup4j`
+
+Run everything from the library repository unless stated otherwise.
+
+---
+
+## A. Rename completeness
+
+These are library-side. None are documentation problems; all of them make
+documentation wrong if left undone.
+
+| # | Item | Verify | Status |
+|---|---|---|---|
+| A1 | Facade renamed to `BlobStore` | `ls dedup4j-spring-boot-starter/src/main/java/com/edem/dedup4j/facade/` shows `BlobStore.java`, not `Dedup4j.java` | ❌ still `Dedup4j` |
+| A2 | Implementation renamed | same directory shows `DefaultBlobStore.java` | ❌ still `DefaultDedup4j` |
+| A3 | Bean method renamed | `grep -rn "Dedup4j dedup4j(" dedup4j-spring-boot-starter/src/main` returns nothing | ❌ outstanding |
+| A4 | All modules renamed | `ls -d blob-helper-*` returns nothing | ❌ `blob-helper-dashboard` remains |
+| A5 | Old package tree gone | `find . -type d -name blobhelper -not -path "*/target/*"` returns nothing | ❌ 3 modules remain |
+| A6 | Artifact IDs renamed | `grep -c "blob-helper" pom.xml */pom.xml` returns 0 | ⬜ unverified |
+
+## B. String literals
+
+Identifier refactoring does not touch string bodies. Each of these is
+user-visible, and the schema names become **immutable in practice** once
+`0.1.0` publishes — changing them later is a breaking migration for every
+consumer.
+
+| # | Literal | Location | Impact | Status |
+|---|---|---|---|---|
+| B1 | `blob_helper_asset_content` | `dedup4j-jpa/.../AssetContent.java` | **Table name.** Highest stakes item in this file | ❌ outstanding |
+| B2 | `uk_blob_helper_asset_content_identity` | same | Unique constraint name | ❌ outstanding |
+| B3 | `idx_blob_helper_asset_content_{hash,object_key,ref_count}` | same | Index names | ❌ outstanding |
+| B4 | `classpath:db/blob-helper/db.changelog-master.yaml` | `Dedup4jSchemaValidator.java` | Liquibase changelog path | ❌ outstanding |
+| B5 | `Path.of("blob-helper-storage")` | `LocalBlobStorageProperties.java` | Default local storage directory | ❌ outstanding |
+| B6 | `./blob-helper-dashboard.sqlite` | dashboard `application.yaml`, `DashboardDatabaseProperties.java` | Default dashboard DB filename | ❌ outstanding |
+
+One sweep covers the lot:
+
+```bash
+grep -rn "blob-helper\|blob_helper\|blobhelper" \
+  --include="*.java" --include="*.sql" --include="*.yml" \
+  --include="*.yaml" --include="*.properties" --include="*.imports" \
+  --include="*.xml" . | grep -v "/target/"
+```
+
+> [!WARNING]
+> `META-INF/spring/*.AutoConfiguration.imports` deserves specific attention.
+> A stale entry silently disables auto-configuration, and `mvnw verify` can
+> still pass if no test asserts bean presence.
+
+## C. Claims made by the documentation site
+
+Each row is something a published page asserts. If the library disagrees, the
+page is wrong and must change — not the other way round.
+
+| # | Claim | Page | Verify | Status |
+|---|---|---|---|---|
+| C1 | Users inject `BlobStore` | Quick start §2, §3 | compiles in a consumer project | ❌ blocked by A1 |
+| C2 | `BlobStore` exposes only `store` / `storeAll` | Quick start §2 | read the interface | ✅ true today |
+| C3 | `retain` / `release` / `get` / `location` are on `BlobDeduplicationService` | Quick start §2, §6 | read the interface | ✅ true today |
+| C4 | `BlobDeduplicationService` is an auto-configured public bean | Quick start §2 | `@ConditionalOnMissingBean` in `Dedup4jServiceAutoConfiguration` | ✅ verified |
+| C5 | `BlobReference` exposes `assetContentId()`, `contentHash()`, `duplicate()` | Quick start §3, §4 | read the record | ✅ verified |
+| C6 | `BlobResource` implements `AutoCloseable` | Quick start §5 | read the record | ✅ verified |
+| C7 | `provider` accepts `local` / `s3` / `azure` | Quick start §1, Installation | `@ConditionalOnProperty havingValue` in the three storage auto-configurations | ✅ verified |
+| C8 | `initialize-schema: EMBEDDED` initialises only for embedded datasources | Quick start §1 | `EmbeddedDatabaseConnection.isEmbedded(dataSource)` in `Dedup4jPersistenceAutoConfiguration` | ✅ verified |
+| C9 | Config prefix is `dedup4j.*` | Quick start §1 | `@ConfigurationProperties(prefix = "dedup4j")` | ✅ verified |
+| C10 | An unselected provider constructs no client and resolves no credentials | Installation, Quick start §1 | **must be proven from an external consumer** — gate G6 | ⬜ asserted, not proven |
+| C11 | Ten artifacts publish to Central; `dedup4j-dashboard` does not | Installation | release runbook artifact manifest | ✅ matches manifest |
+| C12 | Built and tested against Spring Boot 4.1.1 | Home, Installation | root POM `spring-boot.version` | ✅ verified |
+| C13 | Java 21 or later | Home, Installation | root POM `java.version` | ✅ verified |
+| C14 | Physical deletion is not immediate on final release | Quick start §6 | read the deletion path | ⬜ unverified |
+
+## D. Acceptance gates
+
+| # | Gate | Command | Status |
+|---|---|---|---|
+| D1 | Build stays green | `./mvnw clean verify` → `BUILD SUCCESS` | ⬜ not run since rename began |
+| D2 | **Test count unchanged at 189** | same output. A rename that changes the count changed behaviour | ⬜ not run |
+| D3 | Module count unchanged at 11 | same output | ⬜ not run |
+| D4 | Site still builds | `mkdocs build --strict` in this repo | ✅ green |
+| D5 | Examples actually compile | isolated consumer project — gate G6 | ⬜ not run |
+
+## E. Documentation edits owed once the rename lands
+
+Nothing here is blocked; all of it is mechanical once A and B are done.
+
+- [ ] Re-read every code example against the renamed source.
+- [ ] `reference/configuration.md` — document the **renamed** defaults for
+      B5 and B6, not the current ones.
+- [ ] `guides/spring-boot.md` — confirm the auto-configuration class names.
+- [ ] `docs/includes/coordinates.md` — `groupId` at gate G0.
+- [ ] Remove the "not yet on Maven Central" admonition at gate G7.
+
+---
+
+## Legend
+
+✅ verified against source · ❌ known outstanding · ⬜ unverified
+
+A `✅` means someone read the code, not that it looked plausible.
