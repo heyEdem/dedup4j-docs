@@ -133,9 +133,11 @@ as the decrement — see [Retrieval, retain & release](../guides/lifecycle.md).
 
 !!! danger "The count is the only thing protecting your bytes"
     Releasing content that another record still needs deletes the bytes. The
-    count is what dedup4j knows; your records are what is true. Every logical
-    reference you create must be matched by a `retain`, or the count will run
-    ahead of reality.
+    count is what dedup4j knows; your records are what is true.
+
+    Note that `store` already counts for you — including a duplicate store, so
+    step 4 above left the count at 2. Call `retain` only for a record created
+    *without* a store call. Then `release` once per record.
 
     Releasing below zero is rejected with `ReferenceCountUnderflowException`
     rather than silently ignored.

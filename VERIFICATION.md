@@ -9,7 +9,7 @@ is the reconciliation between the two.
 deliberate (decision D3 — documentation ships before the release), but it means
 nothing here is true until verified.
 
-**Last reconciled:** 2026-09-25
+**Last reconciled:** 2026-09-25 (guides pass — 2 published errors found and corrected)
 **Library HEAD at reconciliation:** `94abdd3 refactor(dashboard): rename module to dedup4j`
 
 Run everything from the library repository unless stated otherwise.
@@ -80,7 +80,23 @@ page is wrong and must change — not the other way round.
 | C11 | Ten artifacts publish to Central; `dedup4j-dashboard` does not | Installation | release runbook artifact manifest | ✅ matches manifest |
 | C12 | Built and tested against Spring Boot 4.1.1 | Home, Installation | root POM `spring-boot.version` | ✅ verified |
 | C13 | Java 21 or later | Home, Installation | root POM `java.version` | ✅ verified |
-| C14 | Physical deletion is not immediate on final release | Quick start §6 | read the deletion path | ⬜ unverified |
+| C14 | Final `release` deletes the object immediately, in-transaction | Quick start §6, Lifecycle | `ReferenceCountService.release` → `storage.delete` at zero | ✅ verified — **docs were wrong, corrected** |
+| C15 | A duplicate `store` **increments** the reference count | Uploading, Lifecycle, Quick start | `DefaultBlobDeduplicationService.store` → `retainDuplicate` → `retain` | ✅ verified — **docs were wrong, corrected** |
+| C16 | New content is created at `refCount = 1` | Uploading, Lifecycle | `AssetContent.refCount = 1L` | ✅ verified |
+| C17 | Under-release throws `ReferenceCountUnderflowException` | Lifecycle, Quick start | `ReferenceCountService.release` guard | ✅ verified |
+| C18 | `retain`/`release` hold a pessimistic row lock | Lifecycle | `findForUpdate`, class Javadoc | ✅ verified |
+| C19 | Content identity is `(algorithm, hash, sizeBytes)` | Uploading | `ContentHash` record | ✅ verified |
+| C20 | Six auto-configuration classes | Spring Boot | `META-INF/spring/*.AutoConfiguration.imports` | ✅ verified |
+| C21 | Every bean is `@ConditionalOnMissingBean`-overridable | Spring Boot | `Dedup4jServiceAutoConfiguration` | ✅ verified |
+| C22 | `reconcile` is read-only; repair is opt-in | Lifecycle | `ReconciliationService` Javadoc + `repairEnabled` | ✅ verified |
+| C23 | Nine `dedup4j.*` metrics, names as listed | Observability | `Dedup4jMetrics` string literals | ✅ verified |
+| C24 | `dedup4j.management.enabled` defaults to `false` | Observability | `Dedup4jManagementProperties` | ✅ verified |
+| C25 | `dedup4j.dashboard.enabled` defaults to `true`, lookback `7d` | Observability | `Dedup4jDashboardProperties` | ✅ verified |
+| C26 | Standalone dashboard binds `127.0.0.1`, no auth | Observability | `DEFAULT_ADDRESS`, `application.yaml` | ✅ verified |
+| C27 | S3 adapter exposes no credentials property | Providers | `S3BlobStorageProperties` has no credential fields | ✅ verified |
+| C28 | `BlobStorage` SPI is four methods | Providers | `dedup4j-core/.../BlobStorage.java` | ✅ verified |
+| C29 | Local provider is single-node only | Providers | design claim, not code-enforced | ⬜ reasoned, not proven |
+| C30 | `storeAll` is partial-success with a sealed outcome type | Uploading | `BatchStoreOutcome` sealed interface | ✅ verified |
 
 ## D. Acceptance gates
 
