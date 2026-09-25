@@ -9,7 +9,7 @@ is the reconciliation between the two.
 deliberate (decision D3 — documentation ships before the release), but it means
 nothing here is true until verified.
 
-**Last reconciled:** 2026-09-25 (guides pass — 2 published errors found and corrected)
+**Last reconciled:** 2026-09-25 (all 13 pages written — 5 published errors found and corrected)
 **Library HEAD at reconciliation:** `94abdd3 refactor(dashboard): rename module to dedup4j`
 
 Run everything from the library repository unless stated otherwise.
@@ -45,6 +45,9 @@ consumer.
 | B4 | `classpath:db/blob-helper/db.changelog-master.yaml` | `Dedup4jSchemaValidator.java` | Liquibase changelog path | ❌ outstanding |
 | B5 | `Path.of("blob-helper-storage")` | `LocalBlobStorageProperties.java` | Default local storage directory | ❌ outstanding |
 | B6 | `./blob-helper-dashboard.sqlite` | dashboard `application.yaml`, `DashboardDatabaseProperties.java` | Default dashboard DB filename | ❌ outstanding |
+| B7 | `BLOB_HELPER_DATABASE_CHANGELOG` | `Dedup4jPersistenceAutoConfiguration` | **Liquibase changelog table.** Renaming after release strands migration history | ❌ outstanding |
+| B8 | `BLOB_HELPER_DATABASE_CHANGELOG_LOCK` | same | Liquibase lock table | ❌ outstanding |
+| B9 | `blob_helper_asset_content` in the schema-missing error message | `Dedup4jSchemaValidator` | User-facing error text | ❌ outstanding |
 
 One sweep covers the lot:
 
@@ -80,6 +83,13 @@ page is wrong and must change — not the other way round.
 | C11 | Ten artifacts publish to Central; `dedup4j-dashboard` does not | Installation | release runbook artifact manifest | ✅ matches manifest |
 | C12 | Built and tested against Spring Boot 4.1.1 | Home, Installation | root POM `spring-boot.version` | ✅ verified |
 | C13 | Java 21 or later | Home, Installation | root POM `java.version` | ✅ verified |
+| C34 | Write order is object store first, database second | Architecture | `DefaultBlobDeduplicationService.storeNewContent` | ✅ verified |
+| C35 | Concurrent identical uploads resolve via `createOrRetain` | Architecture | same method | ✅ verified |
+| C36 | S3 keys are `dedup4j.storage.s3.endpoint` / `.path-style` | Providers, Configuration | `Dedup4jProperties.S3` + `S3BlobStorageAutoConfiguration` mapping | ✅ verified — **docs were wrong, corrected** |
+| C37 | `BlobLocation` component is `provider` | API, Lifecycle | `BlobLocation` record | ✅ verified — **docs were wrong, corrected** |
+| C38 | Missing bucket/container fails at startup with a named message | Troubleshooting | `IllegalStateException` in S3/Azure auto-config | ✅ verified |
+| C39 | Schema is applied with Liquibase | Troubleshooting, Spring Boot | `SpringLiquibase` in persistence auto-config | ✅ verified |
+| C40 | Build is 11 modules / 189 tests | Contributing | alignment record; **not re-run since rename** | ⬜ unverified |
 | C31 | Hash algorithm is SHA-256 | Uploading | `Sha256ContentHasher` | ✅ verified |
 | C32 | `max-upload-size` defaults to 25 MB and is enforced | Uploading | `DefaultDedup4j` | ✅ verified |
 | C33 | `ReconciliationService` needs manual construction | Lifecycle | no auto-configuration | ✅ verified |
@@ -113,6 +123,8 @@ Each is a decision for the maintainer, not something the site can fix.
 | F3 | `dedup4j.deduplication.strict-content-type-validation` has no main-code reader | grep | same as F1 |
 | F4 | `ReconciliationService` is **not auto-configured** — no `@Bean` anywhere | no `new ReconciliationService` in main | add a conditional bean, or document manual construction (docs currently do the latter) |
 | F5 | `max-upload-size` defaults to 25 MB and content is read fully into memory to hash | `DefaultDedup4j` line 113 | fine, but the memory cost should be stated in the docs |
+| F6 | `DuplicateContentIdentityException` extends `RuntimeException`, not `Dedup4jException` | class declaration | make it consistent, or a blanket catch of `Dedup4jException` misses it |
+| F7 | `BlobReference.storageProvider` vs `BlobLocation.provider` name the same concept differently | both records | harmless, but free to align before release |
 
 > [!IMPORTANT]
 > F1–F3 are **configuration properties that do nothing**. Published in `0.1.0`
@@ -134,6 +146,7 @@ Each is a decision for the maintainer, not something the site can fix.
 Nothing here is blocked; all of it is mechanical once A and B are done.
 
 - [ ] Re-read every code example against the renamed source.
+- [ ] Re-run `./mvnw clean verify` and confirm 11 modules / 189 tests (C40).
 - [ ] `reference/configuration.md` — document the **renamed** defaults for
       B5 and B6, not the current ones.
 - [ ] `guides/spring-boot.md` — confirm the auto-configuration class names.

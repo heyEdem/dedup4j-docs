@@ -42,7 +42,7 @@ For location without content:
 
 ```java
 BlobLocation location = blobs.location(assetContentId);
-location.storageProvider();
+location.provider();
 location.bucketOrContainer();
 location.objectKey();
 ```
