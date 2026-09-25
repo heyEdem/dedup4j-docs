@@ -100,13 +100,24 @@ a bug worth surfacing.
 
 ### The rule
 
-**Every logical reference needs a matching count.** The first `store` creates
-the content at a count of one. Every *additional* record pointing at that same
-content needs its own `retain`. Every record you delete needs a `release`.
+**Every logical reference needs exactly one count.**
 
-Get this wrong in one direction and content is deleted while records still
-point at it. Get it wrong in the other and content accumulates that nothing
-will ever collect.
+`store` already handles the common case: new content is created at a count of
+one, and a duplicate store retains the existing content. So **one `store` = one
+reference**, needing one `release` when that record goes away.
+
+Call `retain` only when you create a record pointing at content you did **not**
+just store — copying an existing attachment onto a second document, for
+example.
+
+| You did | Then |
+|---|---|
+| `store` (new or duplicate) | already counted — just `release` later |
+| Added a record without storing | `retain` now, `release` later |
+| Deleted a record | `release` |
+
+Count too low and content is deleted while records still point at it. Count too
+high and content accumulates that nothing will ever collect.
 
 ## Reconciliation
 

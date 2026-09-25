@@ -80,15 +80,20 @@ second.assetContentId().equals(first.assetContentId());  // true
 On the second call dedup4j hashes the content, finds an existing row, uploads
 nothing, and returns a reference to the object already stored.
 
-!!! warning "A duplicate store does not increment the count"
-    `store` returning `duplicate: true` tells you the *bytes* were already
-    present. If that call represents a **new record** in your application,
-    call [`retain`](lifecycle.md#retain-and-release) — otherwise the count
-    understates how many of your records depend on the content, and a later
-    release deletes bytes that are still in use.
+!!! tip "A duplicate store already counts for you"
+    `store` returning `duplicate: true` has **already incremented** the
+    reference count. New content is created at a count of one; a duplicate
+    store retains the existing content.
 
-That interaction is the single most important thing to get right when
-integrating dedup4j.
+    So the rule is symmetric: **every `store` call yields exactly one
+    reference, and needs exactly one matching
+    [`release`](lifecycle.md#retain-and-release).** Do not call `retain` after
+    a duplicate store — that would count the same record twice, and the
+    content would never be deleted.
+
+`retain` is for the other case: a **new record pointing at content you did not
+just store**, such as copying an existing attachment onto a second document
+without re-uploading bytes.
 
 ## Batch uploads
 
