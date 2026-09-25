@@ -9,10 +9,11 @@ site_description: >-
   backed by your own database and object store.
 site_author: Edem
 
-# PROVISIONAL. The public repository name and the Pages URL are open questions
-# in the design (§11) and are resolved in release gate G0. Changing this is a
-# one-line edit; nothing else in the site hardcodes the host.
-site_url: https://heyEdem.github.io/dedup4j-docs/
+# Canonical site URL, confirmed against the GitHub Pages API on 2026-09-25.
+# GitHub lowercases the Pages hostname regardless of the account's casing.
+# The Maven Central namespace remains open until gate G0; it lives in
+# docs/includes/coordinates.md, not here.
+site_url: https://heyedem.github.io/dedup4j-docs/
 repo_url: https://github.com/heyEdem/dedup4j
 repo_name: heyEdem/dedup4j
 edit_uri: ""
