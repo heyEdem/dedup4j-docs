@@ -127,14 +127,18 @@ blobs.release(ref.assetContentId());   // that record is gone
 blobs.release(ref.assetContentId());   // the last user is gone
 ```
 
-`retain` increments the count; `release` decrements it. Physical deletion is
-not immediate on the final release — [Retrieval, retain & release](../guides/lifecycle.md)
-explains what actually removes bytes and why that separation exists.
+`retain` increments the count; `release` decrements it. When the count reaches
+zero, **the stored object is deleted immediately**, inside the same transaction
+as the decrement — see [Retrieval, retain & release](../guides/lifecycle.md).
 
-!!! danger "Every store needs a matching release"
-    A `store` you never release leaves content that nothing points at and
-    nothing collects. An over-release is worse: it can drop bytes another
-    record still needs.
+!!! danger "The count is the only thing protecting your bytes"
+    Releasing content that another record still needs deletes the bytes. The
+    count is what dedup4j knows; your records are what is true. Every logical
+    reference you create must be matched by a `retain`, or the count will run
+    ahead of reality.
+
+    Releasing below zero is rejected with `ReferenceCountUnderflowException`
+    rather than silently ignored.
 
 ## What you just proved
 
