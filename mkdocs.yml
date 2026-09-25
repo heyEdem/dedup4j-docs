@@ -1,0 +1,98 @@
+# Blob Helper documentation site.
+# Design: docs/plans/2026-09-01-blob-helper-docs-design.md
+# Scope:  docs/plans/2026-09-24-docs-site-and-release-alignment.md
+
+site_name: Blob Helper
+site_description: >-
+  Store identical bytes once — deduplicated blob storage for Spring Boot,
+  backed by your own database and object store.
+site_author: Edem
+
+# PROVISIONAL. The public repository name and the Pages URL are open questions
+# in the design (§11) and are resolved in release gate G0. Changing this is a
+# one-line edit; nothing else in the site hardcodes the host.
+site_url: https://heyEdem.github.io/blob-helper-docs/
+repo_url: https://github.com/heyEdem/blob-helper
+repo_name: heyEdem/blob-helper
+edit_uri: ""
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+    - search.highlight
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  # The single-coordinate-source mechanism (design §7). Snippets are inert
+  # text includes, deliberately chosen over mkdocs-macros so that a --strict
+  # build can only fail on a missing file, never on template evaluation.
+  - pymdownx.snippets:
+      base_path:
+        - docs/includes
+      check_paths: true
+
+# Everything under docs_dir builds whether or not it appears in nav, so the
+# project record and the snippet fragments are excluded explicitly. They stay
+# in the repository; they are simply not pages of the site.
+exclude_docs: |
+  plans/
+  releases/
+  includes/
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Quick start: getting-started/quick-start.md
+  - Guides:
+      - Spring Boot integration: guides/spring-boot.md
+      - Storage providers: guides/providers.md
+      - Uploading & deduplication: guides/uploading.md
+      - Retrieval, retain & release: guides/lifecycle.md
+      - Observability & dashboards: guides/observability.md
+  - Reference:
+      - Configuration properties: reference/configuration.md
+      - Public API: reference/api.md
+      - Troubleshooting: reference/troubleshooting.md
+  - Architecture & limitations: architecture.md
+  - Contributing: contributing.md

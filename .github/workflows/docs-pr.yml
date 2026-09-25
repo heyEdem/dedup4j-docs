@@ -1,0 +1,32 @@
+# Pull request gate (design §8).
+# Build only. No credentials, no deployment, no external network assertions.
+name: Docs PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install pinned documentation toolchain
+        run: pip install -r requirements.txt
+
+      # --strict turns warnings into errors: unresolved internal links,
+      # missing navigation targets, broken snippet include paths, and
+      # configuration mistakes all fail the build here rather than in
+      # production. It does not validate external URLs by design.
+      - name: Build site
+        run: mkdocs build --strict
