@@ -1,0 +1,32 @@
+# External link check (design §8).
+# Scheduled, never a pull request gate: a required check that depends on
+# third-party uptime would block documentation merges for reasons that have
+# nothing to do with the documentation.
+name: Docs External Links
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --accept 200,206,429 'docs/**/*.md' 'README.md'
+          fail: false
+          output: lychee-report.md
+
+      - uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Broken external links in documentation
+          content-filepath: lychee-report.md
+          labels: documentation

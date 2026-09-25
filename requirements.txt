@@ -1,0 +1,6 @@
+# Pinned documentation toolchain.
+# Bump deliberately: an unpinned theme upgrade can change rendering
+# without any change to the Markdown.
+mkdocs==1.6.1
+mkdocs-material==9.5.44
+pymdown-extensions==10.12
