@@ -121,11 +121,21 @@ try (BlobResource resource = blobs.get(ref.assetContentId())) {
 Two of your records can point at the same stored bytes. Reference counting is
 how dedup4j knows when the content is genuinely unused.
 
+Steps 3 and 4 each counted once, so the count is already **2** — one per
+`store`, including the duplicate.
+
 ```java
-blobs.retain(ref.assetContentId());    // a second record now needs these bytes
-blobs.release(ref.assetContentId());   // that record is gone
-blobs.release(ref.assetContentId());   // the last user is gone
+// count is 2 here: one per store call above
+
+blobs.retain(ref.assetContentId());    // 3 — a record that did not store
+blobs.release(ref.assetContentId());   // 2
+blobs.release(ref.assetContentId());   // 1
+blobs.release(ref.assetContentId());   // 0 — the object is deleted now
 ```
+
+Run this and `./dedup4j-storage` is empty again. Stop one release early and
+the file is still there — which is the behaviour you want, because one of
+your records would still be pointing at it.
 
 `retain` increments the count; `release` decrements it. When the count reaches
 zero, **the stored object is deleted immediately**, inside the same transaction

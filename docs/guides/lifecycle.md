@@ -80,8 +80,13 @@ Two concurrent requests touching the same content serialise rather than race.
 `release` decrements, and **when the count reaches zero it deletes the stored
 object immediately**, within the same transaction as the decrement.
 
-There is no grace period, no soft delete, and no background sweeper for this
-path. A release that takes the count to zero destroys the bytes.
+There is no grace period, no soft delete, and no background sweeper. A release
+that takes the count to zero destroys the bytes.
+
+!!! note "`dedup4j.cleanup.delete-physical-on-zero-references` does not change this"
+    The property exists and binds, but nothing in the library reads it.
+    Deletion at zero is currently unconditional. Do not rely on that property
+    to keep bytes alive.
 
 !!! danger "Rolling back does not restore the object"
     The delete goes to the object store, which has no transaction. If your
@@ -124,10 +129,25 @@ high and content accumulates that nothing will ever collect.
 Counts drift. A crash between your write and your `retain`, a bug, a manual
 database fix — and dedup4j's count no longer matches your records.
 
-`ReconciliationService` compares the two:
+`ReconciliationService` compares the two.
+
+!!! warning "Not auto-configured"
+    Unlike `BlobStore` and `BlobDeduplicationService`, the starter does **not**
+    register a `ReconciliationService` bean. You construct it yourself, which
+    is also where you decide whether repair is enabled.
 
 ```java
-ReconciliationReport report = reconciliation.reconcile(logicalReferenceCountSource);
+@Bean
+ReconciliationService reconciliationService(
+        AssetContentRepository repository,
+        ReferenceCountService referenceCountService) {
+    return new ReconciliationService(repository, referenceCountService, false);
+    //                                            repair enabled ─────┘
+}
+```
+
+```java
+ReconciliationReport report = reconciliationService.reconcile(source);
 report.checkedContentCount();
 report.mismatches();
 ```
