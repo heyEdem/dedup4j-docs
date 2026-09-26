@@ -45,7 +45,7 @@ dedup4j:
 Failing at startup is deliberate — the alternative is discovering it on the
 first upload in production.
 
-### `dedup4j schema table 'blob_helper_asset_content' is missing`
+### `dedup4j schema table 'dedup4j_asset_content' is missing`
 
 The schema was never created. Almost always this:
 

@@ -9,8 +9,8 @@ is the reconciliation between the two.
 deliberate (decision D3 — documentation ships before the release), but it means
 nothing here is true until verified.
 
-**Last reconciled:** 2026-09-25 (all 13 pages written — 5 published errors found and corrected)
-**Library HEAD at reconciliation:** `94abdd3 refactor(dashboard): rename module to dedup4j`
+**Last reconciled:** 2026-09-26 (rename completed and verified; sections A and B closed)
+**Library HEAD at reconciliation:** `ae945a5 refactor: rename facade to BlobStore and finish string-literal rename` (committed locally, not pushed)
 
 Run everything from the library repository unless stated otherwise.
 
@@ -23,12 +23,12 @@ documentation wrong if left undone.
 
 | # | Item | Verify | Status |
 |---|---|---|---|
-| A1 | Facade renamed to `BlobStore` | `ls dedup4j-spring-boot-starter/src/main/java/com/edem/dedup4j/facade/` shows `BlobStore.java`, not `Dedup4j.java` | ❌ still `Dedup4j` |
-| A2 | Implementation renamed | same directory shows `DefaultBlobStore.java` | ❌ still `DefaultDedup4j` |
-| A3 | Bean method renamed | `grep -rn "Dedup4j dedup4j(" dedup4j-spring-boot-starter/src/main` returns nothing | ❌ outstanding |
-| A4 | All modules renamed | `ls -d blob-helper-*` returns nothing | ❌ `blob-helper-dashboard` remains |
-| A5 | Old package tree gone | `find . -type d -name blobhelper -not -path "*/target/*"` returns nothing | ❌ 3 modules remain |
-| A6 | Artifact IDs renamed | `grep -c "blob-helper" pom.xml */pom.xml` returns 0 | ⬜ unverified |
+| A1 | Facade renamed to `BlobStore` | directory now shows `BlobStore.java` | ✅ done |
+| A2 | Implementation renamed | `DefaultBlobStore.java` present | ✅ done |
+| A3 | Bean method renamed | now `BlobStore blobStore(...)` | ✅ done |
+| A4 | All modules renamed | reactor is all `dedup4j-*`; a stray `blob-helper-dashboard/` dir holds only 2 untracked SQLite runtime files | ✅ done |
+| A5 | Old package tree gone | 10 empty leftover dirs removed | ✅ done |
+| A6 | Artifact IDs renamed | returns 0 | ✅ done |
 
 ## B. String literals
 
@@ -39,15 +39,15 @@ consumer.
 
 | # | Literal | Location | Impact | Status |
 |---|---|---|---|---|
-| B1 | `blob_helper_asset_content` | `dedup4j-jpa/.../AssetContent.java` | **Table name.** Highest stakes item in this file | ❌ outstanding |
-| B2 | `uk_blob_helper_asset_content_identity` | same | Unique constraint name | ❌ outstanding |
-| B3 | `idx_blob_helper_asset_content_{hash,object_key,ref_count}` | same | Index names | ❌ outstanding |
-| B4 | `classpath:db/blob-helper/db.changelog-master.yaml` | `Dedup4jSchemaValidator.java` | Liquibase changelog path | ❌ outstanding |
-| B5 | `Path.of("blob-helper-storage")` | `LocalBlobStorageProperties.java` | Default local storage directory | ❌ outstanding |
-| B6 | `./blob-helper-dashboard.sqlite` | dashboard `application.yaml`, `DashboardDatabaseProperties.java` | Default dashboard DB filename | ❌ outstanding |
-| B7 | `BLOB_HELPER_DATABASE_CHANGELOG` | `Dedup4jPersistenceAutoConfiguration` | **Liquibase changelog table.** Renaming after release strands migration history | ❌ outstanding |
-| B8 | `BLOB_HELPER_DATABASE_CHANGELOG_LOCK` | same | Liquibase lock table | ❌ outstanding |
-| B9 | `blob_helper_asset_content` in the schema-missing error message | `Dedup4jSchemaValidator` | User-facing error text | ❌ outstanding |
+| B1 | `blob_helper_asset_content` | `dedup4j-jpa/.../AssetContent.java` | **Table name.** Highest stakes item in this file | ✅ done |
+| B2 | `uk_blob_helper_asset_content_identity` | same | Unique constraint name | ✅ done |
+| B3 | `idx_blob_helper_asset_content_{hash,object_key,ref_count}` | same | Index names | ✅ done |
+| B4 | `classpath:db/blob-helper/db.changelog-master.yaml` | `Dedup4jSchemaValidator.java` | Liquibase changelog path | ✅ done |
+| B5 | `Path.of("blob-helper-storage")` | `LocalBlobStorageProperties.java` | Default local storage directory | ✅ done |
+| B6 | `./blob-helper-dashboard.sqlite` | dashboard `application.yaml`, `DashboardDatabaseProperties.java` | Default dashboard DB filename | ✅ done |
+| B7 | `BLOB_HELPER_DATABASE_CHANGELOG` | `Dedup4jPersistenceAutoConfiguration` | **Liquibase changelog table.** Renaming after release strands migration history | ✅ done |
+| B8 | `BLOB_HELPER_DATABASE_CHANGELOG_LOCK` | same | Liquibase lock table | ✅ done |
+| B9 | `blob_helper_asset_content` in the schema-missing error message | `Dedup4jSchemaValidator` | User-facing error text | ✅ done |
 
 One sweep covers the lot:
 
@@ -70,7 +70,7 @@ page is wrong and must change — not the other way round.
 
 | # | Claim | Page | Verify | Status |
 |---|---|---|---|---|
-| C1 | Users inject `BlobStore` | Quick start §2, §3 | compiles in a consumer project | ❌ blocked by A1 |
+| C1 | Users inject `BlobStore` | Quick start §2, §3 | type now exists; still not compiled by a consumer | ⬜ awaiting G6 |
 | C2 | `BlobStore` exposes only `store` / `storeAll` | Quick start §2 | read the interface | ✅ true today |
 | C3 | `retain` / `release` / `get` / `location` are on `BlobDeduplicationService` | Quick start §2, §6 | read the interface | ✅ true today |
 | C4 | `BlobDeduplicationService` is an auto-configured public bean | Quick start §2 | `@ConditionalOnMissingBean` in `Dedup4jServiceAutoConfiguration` | ✅ verified |
@@ -89,7 +89,7 @@ page is wrong and must change — not the other way round.
 | C37 | `BlobLocation` component is `provider` | API, Lifecycle | `BlobLocation` record | ✅ verified — **docs were wrong, corrected** |
 | C38 | Missing bucket/container fails at startup with a named message | Troubleshooting | `IllegalStateException` in S3/Azure auto-config | ✅ verified |
 | C39 | Schema is applied with Liquibase | Troubleshooting, Spring Boot | `SpringLiquibase` in persistence auto-config | ✅ verified |
-| C40 | Build is 11 modules / 189 tests | Contributing | alignment record; **not re-run since rename** | ⬜ unverified |
+| C40 | Build is 11 modules / **190** tests | Contributing | measured before and after the rename; the 189 in the alignment record is superseded | ✅ verified |
 | C31 | Hash algorithm is SHA-256 | Uploading | `Sha256ContentHasher` | ✅ verified |
 | C32 | `max-upload-size` defaults to 25 MB and is enforced | Uploading | `DefaultDedup4j` | ✅ verified |
 | C33 | `ReconciliationService` needs manual construction | Lifecycle | no auto-configuration | ✅ verified |
@@ -135,9 +135,9 @@ Each is a decision for the maintainer, not something the site can fix.
 
 | # | Gate | Command | Status |
 |---|---|---|---|
-| D1 | Build stays green | `./mvnw clean verify` → `BUILD SUCCESS` | ⬜ not run since rename began |
-| D2 | **Test count unchanged at 189** | same output. A rename that changes the count changed behaviour | ⬜ not run |
-| D3 | Module count unchanged at 11 | same output | ⬜ not run |
+| D1 | Build stays green | `BUILD SUCCESS` on 2026-09-26 | ✅ verified |
+| D2 | **Test count unchanged at 190** | 190 before the rename, 190 after, 0 failures | ✅ verified |
+| D3 | Module count unchanged at 11 | reactor summary | ✅ verified |
 | D4 | Site still builds | `mkdocs build --strict` in this repo | ✅ green |
 | D5 | Examples actually compile | isolated consumer project — gate G6 | ⬜ not run |
 
@@ -145,10 +145,9 @@ Each is a decision for the maintainer, not something the site can fix.
 
 Nothing here is blocked; all of it is mechanical once A and B are done.
 
-- [ ] Re-read every code example against the renamed source.
-- [ ] Re-run `./mvnw clean verify` and confirm 11 modules / 189 tests (C40).
-- [ ] `reference/configuration.md` — document the **renamed** defaults for
-      B5 and B6, not the current ones.
+- [x] Re-read every code example against the renamed source.
+- [x] Re-run `./mvnw clean verify` — 11 modules / 190 tests, green.
+- [x] `reference/configuration.md` now documents the renamed defaults.
 - [ ] `guides/spring-boot.md` — confirm the auto-configuration class names.
 - [ ] `docs/includes/coordinates.md` — `groupId` at gate G0.
 - [ ] Remove the "not yet on Maven Central" admonition at gate G7.
