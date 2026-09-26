@@ -27,11 +27,11 @@ are read from the property classes, not from documentation.
 
 | Property | Default | Notes |
 |---|---|---|
-| `root-directory` | `blob-helper-storage` | Directory holding stored blobs |
+| `root-directory` | `dedup4j-storage` | Directory holding stored blobs |
 
-!!! note "The default still carries the old name"
-    `root-directory` defaults to `blob-helper-storage`, a leftover from before
-    the library was renamed. Set it explicitly rather than relying on it.
+!!! tip "Set it explicitly anyway"
+    Naming the directory in configuration makes the location obvious to the
+    next person reading your config, and to anyone debugging where bytes went.
 
 ### S3
 
@@ -140,7 +140,7 @@ The standalone application is configured independently, not through
 | Property | Default | Notes |
 |---|---|---|
 | `server.address` | `127.0.0.1` | **Its entire security boundary** |
-| `dedup4j.dashboard.database-path` | `./blob-helper-dashboard.sqlite` | Its own SQLite file; name predates the rename |
+| `dedup4j.dashboard.database-path` | `./dedup4j-dashboard.sqlite` | Its own SQLite file, separate from your application database |
 
 !!! danger "Changing `server.address` removes the only protection"
     The standalone dashboard has no authentication. See

@@ -70,7 +70,7 @@ cd dedup4j
 ./mvnw clean verify
 ```
 
-Requires **Java 21**. A green build is 11 modules and 189 tests. Both numbers
+Requires **Java 21**. A green build is 11 modules and 190 tests. Both numbers
 matter: a change that alters the test count changed behaviour, whether or not
 it was meant to.
 
