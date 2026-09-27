@@ -61,9 +61,9 @@ is where collision resistance actually comes from; size is an additional
 discriminator, so two objects match only if both agree.
 
 !!! note "The algorithm is fixed"
-    `dedup4j.deduplication.hash-algorithm` binds and defaults to `SHA-256`, but
-    the library constructs a SHA-256 hasher unconditionally. Setting it to
-    anything else changes nothing today.
+    SHA-256 is not configurable. Changing it would orphan every previously
+    stored object, since identity is the hash — see
+    [`ContentHasher`](../reference/api.md#contenthasher).
 
 What identity is **not**:
 

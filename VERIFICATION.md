@@ -9,8 +9,8 @@ is the reconciliation between the two.
 deliberate (decision D3 — documentation ships before the release), but it means
 nothing here is true until verified.
 
-**Last reconciled:** 2026-09-26 (rename completed and verified; sections A and B closed)
-**Library HEAD at reconciliation:** `ae945a5 refactor: rename facade to BlobStore and finish string-literal rename` (committed locally, not pushed)
+**Last reconciled:** 2026-09-27 (inert properties removed; A, B, and F1–F3 closed)
+**Library HEAD at reconciliation:** `f111599 refactor(starter): remove configuration properties that were never read` (pushed)
 
 Run everything from the library repository unless stated otherwise.
 
@@ -118,18 +118,18 @@ Each is a decision for the maintainer, not something the site can fix.
 
 | # | Finding | Evidence | Suggested action |
 |---|---|---|---|
-| F1 | `dedup4j.cleanup.*` is bound but **never read**. `delete-physical-on-zero-references` disables nothing; deletion at zero is unconditional | zero main-code readers of `getCleanup()` | wire it, or drop the properties before `0.1.0` freezes them |
-| F2 | `dedup4j.deduplication.hash-algorithm` is bound but ignored — `contentHasher()` returns `new Sha256ContentHasher()` unconditionally | `Dedup4jServiceAutoConfiguration` | honour it, or remove it and document SHA-256 as fixed |
-| F3 | `dedup4j.deduplication.strict-content-type-validation` has no main-code reader | grep | same as F1 |
+| F1 | `dedup4j.cleanup.*` bound but never read | zero main-code readers | ✅ **resolved** — properties removed in `f111599` |
+| F2 | `hash-algorithm` bound but ignored | `Dedup4jServiceAutoConfiguration` | ✅ **resolved** — removed; SHA-256 documented as fixed |
+| F3 | `strict-content-type-validation` never read | grep | ✅ **resolved** — removed in `f111599` |
 | F4 | `ReconciliationService` is **not auto-configured** — no `@Bean` anywhere | no `new ReconciliationService` in main | add a conditional bean, or document manual construction (docs currently do the latter) |
 | F5 | `max-upload-size` defaults to 25 MB and content is read fully into memory to hash | `DefaultDedup4j` line 113 | fine, but the memory cost should be stated in the docs |
 | F6 | `DuplicateContentIdentityException` extends `RuntimeException`, not `Dedup4jException` | class declaration | make it consistent, or a blanket catch of `Dedup4jException` misses it |
 | F7 | `BlobReference.storageProvider` vs `BlobLocation.provider` name the same concept differently | both records | harmless, but free to align before release |
 
-> [!IMPORTANT]
-> F1–F3 are **configuration properties that do nothing**. Published in `0.1.0`
-> they become a permanent contract that the library does not honour. Removing
-> them after publication is a breaking change; removing them now costs nothing.
+> [!NOTE]
+> F1–F3 were resolved on 2026-09-27 by removing the four properties rather than
+> wiring them. Wiring would have meant inventing semantics that were never
+> defined. F4–F7 remain open and are not blockers.
 
 ## D. Acceptance gates
 

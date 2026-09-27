@@ -5,11 +5,6 @@
 Every `dedup4j.*` property, its default, and whether it is honoured. Defaults
 are read from the property classes, not from documentation.
 
-!!! warning "Some properties bind but do nothing"
-    Three properties are accepted by Spring, appear in IDE completion, and are
-    **never read by the library**. They are marked **inert** below. Setting
-    them has no effect.
-
 ## Storage
 
 `dedup4j.storage.*`
@@ -76,27 +71,16 @@ database. Against Postgres or MySQL it creates nothing. See
 
 | Property | Default | Notes |
 |---|---|---|
-| `max-upload-size` | `25MB` | **Honoured.** Larger uploads are rejected |
-| `hash-algorithm` | `SHA-256` | **Inert.** A SHA-256 hasher is constructed unconditionally |
-| `strict-content-type-validation` | `false` | **Inert.** No code reads it |
+| `max-upload-size` | `25MB` | Larger uploads are rejected |
 
 !!! warning "Content is read into memory to be hashed"
     Raising `max-upload-size` raises peak memory per concurrent upload. Size
     it against your heap and your concurrency, not against your largest file.
 
-## Cleanup
-
-`dedup4j.cleanup.*`
-
-| Property | Default | Notes |
-|---|---|---|
-| `delete-physical-on-zero-references` | `true` | **Inert.** Deletion at zero is unconditional |
-| `reconciliation-enabled` | `false` | **Inert.** `ReconciliationService` is not auto-configured |
-
-!!! danger "Do not rely on these to protect content"
-    Setting `delete-physical-on-zero-references: false` does **not** stop
-    deletion. The final `release` deletes the object regardless. See
-    [Retrieval, retain & release](../guides/lifecycle.md#what-happens-at-zero).
+!!! note "Content identity is not configurable"
+    The hash algorithm is fixed at SHA-256, and deletion at zero references is
+    unconditional. Neither has a property, because neither is a choice the
+    library offers.
 
 ## Management
 

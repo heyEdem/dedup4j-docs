@@ -163,17 +163,14 @@ construct it yourself, and repair is off unless explicitly enabled. See
 Read a report before enabling repair. Automatic repair against a faulty
 `LogicalReferenceCountSource` corrupts correct counts at speed.
 
-## Configuration that appears to do nothing
+## A property you set had no effect
 
-Some properties bind and are never read. Setting them has no effect:
+Check the spelling against [Configuration properties](configuration.md) —
+Spring binds relaxed names, but an unrecognised key under `dedup4j.*` is
+silently ignored rather than rejected.
 
-- `dedup4j.deduplication.hash-algorithm`
-- `dedup4j.deduplication.strict-content-type-validation`
-- `dedup4j.cleanup.delete-physical-on-zero-references`
-- `dedup4j.cleanup.reconciliation-enabled`
-
-See [Configuration properties](configuration.md). If you set one of these and
-nothing changed, the property is the problem, not your configuration.
+Every property listed there is read by the library. If one appears to do
+nothing, that is a bug worth reporting.
 
 ## Still stuck
 

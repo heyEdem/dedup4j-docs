@@ -83,10 +83,9 @@ object immediately**, within the same transaction as the decrement.
 There is no grace period, no soft delete, and no background sweeper. A release
 that takes the count to zero destroys the bytes.
 
-!!! note "`dedup4j.cleanup.delete-physical-on-zero-references` does not change this"
-    The property exists and binds, but nothing in the library reads it.
-    Deletion at zero is currently unconditional. Do not rely on that property
-    to keep bytes alive.
+!!! note "There is no switch for this"
+    Deletion at zero is unconditional. No configuration disables it, so the
+    reference count is the only thing that decides whether bytes survive.
 
 !!! danger "Rolling back does not restore the object"
     The delete goes to the object store, which has no transaction. If your

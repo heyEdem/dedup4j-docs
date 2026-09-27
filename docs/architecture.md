@@ -127,8 +127,6 @@ randomness in it turns a harmless duplicate write into two divergent objects.
 - **The local provider assumes one node**, or a shared mount.
 - **Reference counts can drift** from your records after a crash or a manual
   database edit. Reconciliation finds drift; it does not prevent it.
-- **Four configuration properties bind but are never read.** See
-  [Configuration properties](reference/configuration.md).
 - **Deletion at zero is unconditional** and cannot currently be disabled.
 
 ## Design records
