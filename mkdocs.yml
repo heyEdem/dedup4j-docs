@@ -9,11 +9,13 @@ site_description: >-
   backed by your own database and object store.
 site_author: Edem
 
-# Canonical site URL, confirmed against the GitHub Pages API on 2026-09-25.
-# GitHub lowercases the Pages hostname regardless of the account's casing.
-# The Maven Central namespace remains open until gate G0; it lives in
-# docs/includes/coordinates.md, not here.
-site_url: https://heyedem.github.io/dedup4j-docs/
+# TEMPORARY custom domain. This is a stub on a domain Edem already controls,
+# used until the permanent dedup4j domain is registered. Swapping it is three
+# steps: this line, docs/CNAME, and the repo's Pages custom-domain setting.
+# The old heyedem.github.io/dedup4j-docs/ URL keeps working; GitHub does NOT
+# redirect a retired custom domain, so links shared on this host will break
+# when it changes.
+site_url: https://dedup4j.churchillakomaning.online/
 repo_url: https://github.com/heyEdem/dedup4j
 repo_name: heyEdem/dedup4j
 edit_uri: ""
