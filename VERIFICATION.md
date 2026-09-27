@@ -91,7 +91,7 @@ page is wrong and must change — not the other way round.
 | C39 | Schema is applied with Liquibase | Troubleshooting, Spring Boot | `SpringLiquibase` in persistence auto-config | ✅ verified |
 | C40 | Build is 11 modules / **190** tests | Contributing | measured before and after the rename; the 189 in the alignment record is superseded | ✅ verified |
 | C31 | Hash algorithm is SHA-256 | Uploading | `Sha256ContentHasher` | ✅ verified |
-| C32 | `max-upload-size` defaults to 25 MB and is enforced | Uploading | `DefaultDedup4j` | ✅ verified |
+| C32 | `max-upload-size` defaults to 25 MB and is enforced | Uploading |  `DefaultBlobStore` | ✅ verified |
 | C33 | `ReconciliationService` needs manual construction | Lifecycle | no auto-configuration | ✅ verified |
 | C14 | Final `release` deletes the object immediately, in-transaction | Quick start §6, Lifecycle | `ReferenceCountService.release` → `storage.delete` at zero | ✅ verified — **docs were wrong, corrected** |
 | C15 | A duplicate `store` **increments** the reference count | Uploading, Lifecycle, Quick start | `DefaultBlobDeduplicationService.store` → `retainDuplicate` → `retain` | ✅ verified — **docs were wrong, corrected** |
@@ -122,7 +122,7 @@ Each is a decision for the maintainer, not something the site can fix.
 | F2 | `hash-algorithm` bound but ignored | `Dedup4jServiceAutoConfiguration` | ✅ **resolved** — removed; SHA-256 documented as fixed |
 | F3 | `strict-content-type-validation` never read | grep | ✅ **resolved** — removed in `f111599` |
 | F4 | `ReconciliationService` is **not auto-configured** — no `@Bean` anywhere | no `new ReconciliationService` in main | add a conditional bean, or document manual construction (docs currently do the latter) |
-| F5 | `max-upload-size` defaults to 25 MB and content is read fully into memory to hash | `DefaultDedup4j` line 113 | fine, but the memory cost should be stated in the docs |
+| F5 | `max-upload-size` defaults to 25 MB and content is read fully into memory to hash |  `DefaultBlobStore` line 113 | fine, but the memory cost should be stated in the docs |
 | F6 | `DuplicateContentIdentityException` extends `RuntimeException`, not `Dedup4jException` | class declaration | make it consistent, or a blanket catch of `Dedup4jException` misses it |
 | F7 | `BlobReference.storageProvider` vs `BlobLocation.provider` name the same concept differently | both records | harmless, but free to align before release |
 
