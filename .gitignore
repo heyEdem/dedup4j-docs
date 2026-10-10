@@ -1,10 +1,14 @@
-# Python
-.venv/
-__pycache__/
-*.pyc
-
-# MkDocs build output
-site/
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.log
 
 # macOS
 .DS_Store
+
+# Vercel
+.vercel/
+
+# Execution ledger
+.superpowers/
