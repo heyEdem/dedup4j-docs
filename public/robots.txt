@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dedup4j.churchillakomaning.online/sitemap.xml
