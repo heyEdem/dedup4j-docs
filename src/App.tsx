@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router'
 import { Navigation } from './components/Navigation'
 import { Footer } from './components/Footer'
 import { DocsPage } from './components/DocsPage'
+import { LandingPage } from './components/LandingPage'
 import { NotFound } from './components/NotFound'
 import { Seo } from './components/Seo'
 
@@ -26,7 +27,7 @@ export default function App() {
       <Navigation onSearch={() => setSearchOpen(true)} />
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Navigate to="/docs" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/docs/*" element={<DocsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
