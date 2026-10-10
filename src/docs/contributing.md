@@ -1,3 +1,9 @@
+---
+title: Contributing
+description: Build dedup4j from source and contribute changes.
+category: Project
+order: 12
+---
 # Contributing
 
 --8<-- "not-on-central.md"
@@ -15,37 +21,41 @@ exist.
 
 ## Editing the documentation
 
+The site is a Vite + React app that renders the Markdown files in
+`src/docs/`.
+
 ```bash
 git clone https://github.com/heyEdem/dedup4j-docs
 cd dedup4j-docs
 
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/mkdocs serve
+npm install
+npm run dev
 ```
 
-Live reload on <http://127.0.0.1:8000>.
-
-Before opening a pull request:
+The dev server reloads on every change. Before opening a pull request:
 
 ```bash
-.venv/bin/mkdocs build --strict
+npm test
+npm run build
 ```
 
-This is the same command CI runs. **Strict mode is not advisory** — it fails on
-unresolved internal links, missing navigation targets, and broken snippet
-paths. A warning locally is a red build.
+This is the same pair of commands CI runs. The build fails on broken internal
+links and missing anchors, so a red build means a page points somewhere that
+does not exist.
+
+Each page starts with frontmatter (`title`, `description`, `category`,
+`order`); adding a file with those four fields adds a page to the sidebar.
 
 ### Never hardcode coordinates
 
-Group ID, artifact ID, and version appear in `docs/includes/` and nowhere
+Group ID, artifact ID, and version appear in `src/docs/_includes/` and nowhere
 else. Pages include a fragment:
 
 ```markdown
 --8<-- "dep-maven.md"
 ```
 
-A release then updates one file instead of hunting through thirteen pages. A
+A release then updates one file instead of hunting through every page. A
 pull request that types a version into a page will be asked to change it.
 
 ### Documentation must be true, not aspirational
@@ -57,10 +67,12 @@ library disagree, the page is wrong.
 about the library and whether it has been checked against source. Adding a
 claim means adding a row.
 
-!!! warning "Examples must come from something that compiled"
-    Dependency snippets are copied **from** a verified consumer project into
-    the docs, never the reverse. A snippet nobody compiled is an assertion,
-    not documentation.
+> [!WARNING]
+> **Examples must come from something that compiled**
+>
+> Dependency snippets are copied **from** a verified consumer project into
+> the docs, never the reverse. A snippet nobody compiled is an assertion,
+> not documentation.
 
 ## Working on the library
 

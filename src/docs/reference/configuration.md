@@ -1,3 +1,9 @@
+---
+title: Configuration properties
+description: Every dedup4j configuration property and its default.
+category: Reference
+order: 8
+---
 # Configuration properties
 
 --8<-- "not-on-central.md"
@@ -24,9 +30,11 @@ are read from the property classes, not from documentation.
 |---|---|---|
 | `root-directory` | `dedup4j-storage` | Directory holding stored blobs |
 
-!!! tip "Set it explicitly anyway"
-    Naming the directory in configuration makes the location obvious to the
-    next person reading your config, and to anyone debugging where bytes went.
+> [!TIP]
+> **Set it explicitly anyway**
+>
+> Naming the directory in configuration makes the location obvious to the
+> next person reading your config, and to anyone debugging where bytes went.
 
 ### S3
 
@@ -73,14 +81,18 @@ database. Against Postgres or MySQL it creates nothing. See
 |---|---|---|
 | `max-upload-size` | `25MB` | Larger uploads are rejected |
 
-!!! warning "Content is read into memory to be hashed"
-    Raising `max-upload-size` raises peak memory per concurrent upload. Size
-    it against your heap and your concurrency, not against your largest file.
+> [!WARNING]
+> **Content is read into memory to be hashed**
+>
+> Raising `max-upload-size` raises peak memory per concurrent upload. Size
+> it against your heap and your concurrency, not against your largest file.
 
-!!! note "Content identity is not configurable"
-    The hash algorithm is fixed at SHA-256, and deletion at zero references is
-    unconditional. Neither has a property, because neither is a choice the
-    library offers.
+> [!NOTE]
+> **Content identity is not configurable**
+>
+> The hash algorithm is fixed at SHA-256, and deletion at zero references is
+> unconditional. Neither has a property, because neither is a choice the
+> library offers.
 
 ## Management
 
@@ -126,9 +138,11 @@ The standalone application is configured independently, not through
 | `server.address` | `127.0.0.1` | **Its entire security boundary** |
 | `dedup4j.dashboard.database-path` | `./dedup4j-dashboard.sqlite` | Its own SQLite file, separate from your application database |
 
-!!! danger "Changing `server.address` removes the only protection"
-    The standalone dashboard has no authentication. See
-    [Observability & dashboards](../guides/observability.md#it-binds-to-loopback-on-purpose).
+> [!CAUTION]
+> **Changing `server.address` removes the only protection**
+>
+> The standalone dashboard has no authentication. See
+> [Observability & dashboards](../guides/observability.md#it-binds-to-loopback-on-purpose).
 
 ## Minimal working configuration
 

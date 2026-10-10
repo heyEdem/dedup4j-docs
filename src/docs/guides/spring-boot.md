@@ -1,3 +1,9 @@
+---
+title: Spring Boot integration
+description: How dedup4j auto-configures inside a Spring Boot application.
+category: Guides
+order: 3
+---
 # Spring Boot integration
 
 --8<-- "not-on-central.md"
@@ -70,12 +76,14 @@ dedup4j:
 | `always` | Creates the schema regardless of database |
 | `never` | Creates nothing. You own the DDL |
 
-!!! warning "`embedded` does not mean 'on'"
-    The name describes *when* it acts, not that it is enabled. Pointing a
-    default configuration at Postgres or MySQL creates **no tables**, and the
-    first store fails on a missing table. That is intentional — silently
-    running DDL against a production database is worse — but it surprises
-    people.
+> [!WARNING]
+> **`embedded` does not mean 'on'**
+>
+> The name describes *when* it acts, not that it is enabled. Pointing a
+> default configuration at Postgres or MySQL creates **no tables**, and the
+> first store fails on a missing table. That is intentional — silently
+> running DDL against a production database is worse — but it surprises
+> people.
 
 For anything beyond development, prefer `never` and manage the schema with
 your existing migration tool. A library should not be the thing that alters

@@ -16,6 +16,11 @@ describe('expandIncludes', () => {
     expect(() => expandIncludes('--8<-- "nope.md"', inc)).toThrow(/nope\.md/)
   })
 
+  it('does not expand include lines inside fenced code (documenting the syntax)', () => {
+    const md = '```markdown\n--8<-- "a.md"\n```\n--8<-- "b.md"'
+    expect(expandIncludes(md, inc)).toBe('```markdown\n--8<-- "a.md"\n```\nbee')
+  })
+
   it('leaves other text alone', () => {
     expect(expandIncludes('no includes here', inc)).toBe('no includes here')
   })

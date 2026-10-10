@@ -1,3 +1,9 @@
+---
+title: Public API
+description: The public types and methods of dedup4j.
+category: Reference
+order: 9
+---
 # Public API
 
 --8<-- "not-on-central.md"
@@ -5,10 +11,12 @@
 The types dedup4j expects you to use. Everything here is in
 `com.edem.dedup4j.*`.
 
-!!! note "Records, not beans"
-    Every model type is an immutable `record` with validation in its compact
-    constructor. There are no setters, and an invalid instance cannot be
-    constructed.
+> [!NOTE]
+> **Records, not beans**
+>
+> Every model type is an immutable `record` with validation in its compact
+> constructor. There are no setters, and an invalid instance cannot be
+> constructed.
 
 ## Entry points
 
@@ -205,10 +213,12 @@ public interface ContentHasher {
 }
 ```
 
-!!! warning "Changing this orphans existing content"
-    Identity is the hash. Existing rows keep hashes from the old algorithm,
-    so previously stored content will never match again and will be stored a
-    second time.
+> [!WARNING]
+> **Changing this orphans existing content**
+>
+> Identity is the hash. Existing rows keep hashes from the old algorithm,
+> so previously stored content will never match again and will be stored a
+> second time.
 
 ## Reconciliation
 

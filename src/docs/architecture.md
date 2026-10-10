@@ -1,3 +1,9 @@
+---
+title: Architecture & limitations
+description: How dedup4j works, and what it deliberately does not do.
+category: Project
+order: 11
+---
 # Architecture & limitations
 
 --8<-- "not-on-central.md"
@@ -65,9 +71,11 @@ racing.
 
 ## The limit that matters: two systems, one operation
 
-!!! danger "The database and the object store cannot commit together"
-    A store touches an object store and a database. There is no shared
-    transaction, and dedup4j does not implement a distributed one.
+> [!CAUTION]
+> **The database and the object store cannot commit together**
+>
+> A store touches an object store and a database. There is no shared
+> transaction, and dedup4j does not implement a distributed one.
 
 ### What that means in practice
 

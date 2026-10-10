@@ -1,3 +1,9 @@
+---
+title: Retrieval, retain & release
+description: Read blobs back and manage their reference counts.
+category: Guides
+order: 6
+---
 # Retrieval, retain & release
 
 --8<-- "not-on-central.md"
@@ -49,9 +55,11 @@ location.objectKey();
 
 ### Why there are no presigned URLs
 
-!!! warning "dedup4j does not issue presigned URLs"
-    Content streams through your application. There is no
-    `getDownloadUrl(id)`.
+> [!WARNING]
+> **dedup4j does not issue presigned URLs**
+>
+> Content streams through your application. There is no
+> `getDownloadUrl(id)`.
 
 This is a deliberate boundary, not a missing feature. A presigned URL is an
 authorization decision — who may read this, for how long, under what audit
@@ -83,18 +91,22 @@ object immediately**, within the same transaction as the decrement.
 There is no grace period, no soft delete, and no background sweeper. A release
 that takes the count to zero destroys the bytes.
 
-!!! note "There is no switch for this"
-    Deletion at zero is unconditional. No configuration disables it, so the
-    reference count is the only thing that decides whether bytes survive.
+> [!NOTE]
+> **There is no switch for this**
+>
+> Deletion at zero is unconditional. No configuration disables it, so the
+> reference count is the only thing that decides whether bytes survive.
 
-!!! danger "Rolling back does not restore the object"
-    The delete goes to the object store, which has no transaction. If your
-    transaction rolls back **after** the delete, the database row returns and
-    the bytes do not.
-
-    This is the same non-atomicity described in
-    [Architecture & limitations](../architecture.md), seen from the deletion
-    side.
+> [!CAUTION]
+> **Rolling back does not restore the object**
+>
+> The delete goes to the object store, which has no transaction. If your
+> transaction rolls back **after** the delete, the database row returns and
+> the bytes do not.
+>
+> This is the same non-atomicity described in
+> [Architecture & limitations](../architecture.md), seen from the deletion
+> side.
 
 ### Under-release is rejected
 
@@ -130,11 +142,12 @@ database fix — and dedup4j's count no longer matches your records.
 
 `ReconciliationService` compares the two.
 
-!!! warning "Not auto-configured"
-    Unlike `BlobStore` and `BlobDeduplicationService`, the starter does **not**
-    register a `ReconciliationService` bean. You construct it yourself, which
-    is also where you decide whether repair is enabled.
-
+> [!WARNING]
+> **Not auto-configured**
+>
+> Unlike `BlobStore` and `BlobDeduplicationService`, the starter does **not**
+> register a `ReconciliationService` bean. You construct it yourself, which
+> is also where you decide whether repair is enabled.
 ```java
 @Bean
 ReconciliationService reconciliationService(
@@ -154,13 +167,15 @@ report.mismatches();
 You supply a `LogicalReferenceCountSource` — dedup4j cannot enumerate your
 records, so you tell it what the counts *should* be.
 
-!!! tip "Reporting is read-only by default"
-    `reconcile` only reports. Repair is a separate operation, **disabled
-    unless explicitly enabled** when the service is constructed.
-
-    That default is deliberate: automatic repair against a faulty
-    `LogicalReferenceCountSource` would corrupt correct counts at machine
-    speed. Look at a report before enabling repair.
+> [!TIP]
+> **Reporting is read-only by default**
+>
+> `reconcile` only reports. Repair is a separate operation, **disabled
+> unless explicitly enabled** when the service is constructed.
+>
+> That default is deliberate: automatic repair against a faulty
+> `LogicalReferenceCountSource` would corrupt correct counts at machine
+> speed. Look at a report before enabling repair.
 
 When repair is enabled, adjustments go through the same lock-aware
 reference-count service, and the caller must keep a transaction open for the

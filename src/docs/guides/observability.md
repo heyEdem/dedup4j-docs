@@ -1,3 +1,9 @@
+---
+title: Observability & dashboards
+description: Metrics, actuator endpoints and dashboards for dedup4j.
+category: Guides
+order: 7
+---
 # Observability & dashboards
 
 --8<-- "not-on-central.md"
@@ -23,14 +29,18 @@ already uses.
 | `dedup4j.storage.delete.failures` | deletions that failed |
 | `dedup4j.repairs` | reconciliation repairs applied |
 
-!!! tip "The two that justify the library"
-    `dedup4j.bytes.avoided` against `dedup4j.bytes.accepted` is the dedup
-    ratio — the number to put on a dashboard.
+> [!TIP]
+> **The two that justify the library**
+>
+> `dedup4j.bytes.avoided` against `dedup4j.bytes.accepted` is the dedup
+> ratio — the number to put on a dashboard.
 
-!!! warning "Watch `dedup4j.storage.delete.failures`"
-    A failed delete means the reference count reached zero but the object
-    survived: bytes you are paying for that nothing points at. Nothing retries
-    it automatically. Non-zero here is a cleanup backlog, and it only grows.
+> [!WARNING]
+> **Watch `dedup4j.storage.delete.failures`**
+>
+> A failed delete means the reference count reached zero but the object
+> survived: bytes you are paying for that nothing points at. Nothing retries
+> it automatically. Non-zero here is a cleanup backlog, and it only grows.
 
 ## Management endpoints
 
@@ -51,12 +61,14 @@ dedup4j:
 | `instance-name` | `dedup4j` |
 | `instance-id` | a random UUID per application instance |
 
-!!! danger "These endpoints are not secured by dedup4j"
-    Enabling them mounts routes in your application. dedup4j does not
-    authenticate them — that is your `SecurityFilterChain`'s job, and it does
-    not know they exist unless you say so.
-
-    Defaulting to `false` exists so nobody publishes them by accident.
+> [!CAUTION]
+> **These endpoints are not secured by dedup4j**
+>
+> Enabling them mounts routes in your application. dedup4j does not
+> authenticate them — that is your `SecurityFilterChain`'s job, and it does
+> not know they exist unless you say so.
+>
+> Defaulting to `false` exists so nobody publishes them by accident.
 
 ## Embedded dashboard
 
@@ -107,14 +119,16 @@ java -jar dedup4j-dashboard.jar
 
 ### It binds to loopback on purpose
 
-!!! danger "The security boundary is `127.0.0.1`, and that is all of it"
-    The standalone dashboard binds to `127.0.0.1` by default. It has **no
-    authentication and no authorization**. Its entire security model is that
-    nothing outside the machine can reach it.
-
-    Changing `server.address` to `0.0.0.0` removes that boundary and replaces
-    it with nothing. If you need remote access, tunnel to it (`ssh -L`) or put
-    an authenticating reverse proxy in front. Do not simply rebind it.
+> [!CAUTION]
+> **The security boundary is `127.0.0.1`, and that is all of it**
+>
+> The standalone dashboard binds to `127.0.0.1` by default. It has **no
+> authentication and no authorization**. Its entire security model is that
+> nothing outside the machine can reach it.
+>
+> Changing `server.address` to `0.0.0.0` removes that boundary and replaces
+> it with nothing. If you need remote access, tunnel to it (`ssh -L`) or put
+> an authenticating reverse proxy in front. Do not simply rebind it.
 
 It keeps its own SQLite database for polled history and does not write to your
 application's database.

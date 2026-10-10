@@ -1,3 +1,9 @@
+---
+title: Troubleshooting
+description: Exceptions, failure modes and how to diagnose them.
+category: Reference
+order: 10
+---
 # Troubleshooting
 
 --8<-- "not-on-central.md"
@@ -21,10 +27,12 @@ RuntimeException
 
 Catch `Dedup4jException` to handle everything from the library at once.
 
-!!! note "One exception sits outside the hierarchy"
-    `DuplicateContentIdentityException` extends `RuntimeException` directly,
-    not `Dedup4jException`. A blanket `catch (Dedup4jException)` will not
-    catch it.
+> [!NOTE]
+> **One exception sits outside the hierarchy**
+>
+> `DuplicateContentIdentityException` extends `RuntimeException` directly,
+> not `Dedup4jException`. A blanket `catch (Dedup4jException)` will not
+> catch it.
 
 ## Startup failures
 
@@ -140,9 +148,11 @@ Remember the rule: **one `store` = one reference**. `retain` is only for a
 record created without a store call. See
 [Retrieval, retain & release](../guides/lifecycle.md#the-rule).
 
-!!! tip "Surfaced, not swallowed"
-    This throws rather than silently clamping at zero, because a count that
-    disagrees with your records is a bug you want to find.
+> [!TIP]
+> **Surfaced, not swallowed**
+>
+> This throws rather than silently clamping at zero, because a count that
+> disagrees with your records is a bug you want to find.
 
 ## Operational signals
 

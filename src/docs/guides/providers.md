@@ -1,3 +1,9 @@
+---
+title: Storage providers
+description: Configure the filesystem, S3 or Azure storage provider.
+category: Guides
+order: 4
+---
 # Storage providers
 
 --8<-- "not-on-central.md"
@@ -12,14 +18,16 @@ dedup4j:
     provider: local   # local | s3 | azure
 ```
 
-!!! tip "Unselected providers do nothing"
-    An adapter that is not selected constructs no client and resolves no
-    credentials. Having `dedup4j-storage-s3` on the classpath does not mean
-    your application contacts AWS, and a missing AWS credential file is not an
-    error when `provider` is `local`.
-
-    This is a design commitment. It is verified from an external consumer
-    project at release gate G6 rather than asserted here.
+> [!TIP]
+> **Unselected providers do nothing**
+>
+> An adapter that is not selected constructs no client and resolves no
+> credentials. Having `dedup4j-storage-s3` on the classpath does not mean
+> your application contacts AWS, and a missing AWS credential file is not an
+> error when `provider` is `local`.
+>
+> This is a design commitment. It is verified from an external consumer
+> project at release gate G6 rather than asserted here.
 
 ## Local filesystem
 
@@ -37,12 +45,14 @@ dedup4j:
 |---|---|
 | `root-directory` | Directory holding stored blobs |
 
-!!! warning "Intended for a single node"
-    Nothing in the adapter prevents multi-node use, but two instances with
-    separate filesystems share one database and two different sets of bytes.
-    The database can say content exists while the disk of the node handling
-    the request does not have it. Use object storage for anything multi-node,
-    or give every node the same shared mount.
+> [!WARNING]
+> **Intended for a single node**
+>
+> Nothing in the adapter prevents multi-node use, but two instances with
+> separate filesystems share one database and two different sets of bytes.
+> The database can say content exists while the disk of the node handling
+> the request does not have it. Use object storage for anything multi-node,
+> or give every node the same shared mount.
 
 ## Amazon S3
 
@@ -75,17 +85,18 @@ That means in production you attach an IAM role and configure nothing. A
 library that accepted `access-key` and `secret-key` as configuration would
 invite them into `application.yaml`, and from there into version control.
 
-=== "Development"
-
-    ```bash
-    export AWS_ACCESS_KEY_ID=...
-    export AWS_SECRET_ACCESS_KEY=...
-    export AWS_REGION=eu-west-1
-    ```
-
-=== "Production"
-
-    Attach an IAM role to the task, pod, or instance. Set nothing.
+::::tabs
+:::tab{title="Development"}
+```bash
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+export AWS_REGION=eu-west-1
+```
+:::
+:::tab{title="Production"}
+Attach an IAM role to the task, pod, or instance. Set nothing.
+:::
+::::
 
 ### MinIO or other S3-compatible
 
@@ -121,11 +132,13 @@ dedup4j:
 | `endpoint` | Custom endpoint, e.g. Azurite |
 | `connection-string` | Full connection string — **development only** |
 
-!!! danger "connection-string carries an embedded key"
-    A connection string contains an account key in plaintext. Use it against
-    Azurite locally; in production prefer a managed identity and supply
-    `account-name` and `endpoint`. A connection string in `application.yaml`
-    is a credential in version control.
+> [!CAUTION]
+> **connection-string carries an embedded key**
+>
+> A connection string contains an account key in plaintext. Use it against
+> Azurite locally; in production prefer a managed identity and supply
+> `account-name` and `endpoint`. A connection string in `application.yaml`
+> is a credential in version control.
 
 ## Custom providers
 

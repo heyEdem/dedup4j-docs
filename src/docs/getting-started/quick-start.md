@@ -1,3 +1,9 @@
+---
+title: Quick start
+description: Store, retrieve and release your first blob.
+category: Getting started
+order: 2
+---
 # Quick start
 
 --8<-- "not-on-central.md"
@@ -35,9 +41,11 @@ Two things are happening:
   `DataSource` is an embedded database. Against Postgres or MySQL nothing is
   created unless you set `ALWAYS`.
 
-!!! note "Set the storage directory explicitly"
-    `root-directory` has a default, but naming it in configuration makes the
-    location obvious to the next person reading your config.
+> [!NOTE]
+> **Set the storage directory explicitly**
+>
+> `root-directory` has a default, but naming it in configuration makes the
+> location obvious to the next person reading your config.
 
 ## 2. Inject the two beans
 
@@ -111,10 +119,12 @@ try (BlobResource resource = blobs.get(ref.assetContentId())) {
 }
 ```
 
-!!! warning "Not a presigned URL"
-    This streams bytes through your application. dedup4j does not issue
-    time-limited direct-to-storage URLs — see
-    [Retrieval, retain & release](../guides/lifecycle.md).
+> [!WARNING]
+> **Not a presigned URL**
+>
+> This streams bytes through your application. dedup4j does not issue
+> time-limited direct-to-storage URLs — see
+> [Retrieval, retain & release](../guides/lifecycle.md).
 
 ## 6. Retain and release
 
@@ -141,16 +151,18 @@ your records would still be pointing at it.
 zero, **the stored object is deleted immediately**, inside the same transaction
 as the decrement — see [Retrieval, retain & release](../guides/lifecycle.md).
 
-!!! danger "The count is the only thing protecting your bytes"
-    Releasing content that another record still needs deletes the bytes. The
-    count is what dedup4j knows; your records are what is true.
-
-    Note that `store` already counts for you — including a duplicate store, so
-    step 4 above left the count at 2. Call `retain` only for a record created
-    *without* a store call. Then `release` once per record.
-
-    Releasing below zero is rejected with `ReferenceCountUnderflowException`
-    rather than silently ignored.
+> [!CAUTION]
+> **The count is the only thing protecting your bytes**
+>
+> Releasing content that another record still needs deletes the bytes. The
+> count is what dedup4j knows; your records are what is true.
+>
+> Note that `store` already counts for you — including a duplicate store, so
+> step 4 above left the count at 2. Call `retain` only for a record created
+> *without* a store call. Then `release` once per record.
+>
+> Releasing below zero is rejected with `ReferenceCountUnderflowException`
+> rather than silently ignored.
 
 ## What you just proved
 

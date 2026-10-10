@@ -1,3 +1,9 @@
+---
+title: Uploading & deduplication
+description: How uploads are hashed, deduplicated and batched.
+category: Guides
+order: 5
+---
 # Uploading & deduplication
 
 --8<-- "not-on-central.md"
@@ -22,14 +28,18 @@ Four `store` overloads for the four shapes bytes usually arrive in — a web
 upload, a file on disk, an in-memory array, or a stream you are already
 holding.
 
-!!! warning "Uploads are capped at 25 MB by default"
-    `dedup4j.deduplication.max-upload-size` defaults to `25MB` and **is**
-    enforced. Larger uploads are rejected. Raise it deliberately — the content
-    is read into memory to be hashed.
+> [!WARNING]
+> **Uploads are capped at 25 MB by default**
+>
+> `dedup4j.deduplication.max-upload-size` defaults to `25MB` and **is**
+> enforced. Larger uploads are rejected. Raise it deliberately — the content
+> is read into memory to be hashed.
 
-!!! note "The stream overload needs the size up front"
-    `sizeBytes` is a parameter because content length is part of content
-    identity and dedup4j will not buffer an entire stream to discover it.
+> [!NOTE]
+> **The stream overload needs the size up front**
+>
+> `sizeBytes` is a parameter because content length is part of content
+> identity and dedup4j will not buffer an entire stream to discover it.
 
 ## What `store` returns
 
@@ -60,10 +70,12 @@ Identity is the **triple**, not the hash alone. The digest is SHA-256, which
 is where collision resistance actually comes from; size is an additional
 discriminator, so two objects match only if both agree.
 
-!!! note "The algorithm is fixed"
-    SHA-256 is not configurable. Changing it would orphan every previously
-    stored object, since identity is the hash — see
-    [`ContentHasher`](../reference/api.md#contenthasher).
+> [!NOTE]
+> **The algorithm is fixed**
+>
+> SHA-256 is not configurable. Changing it would orphan every previously
+> stored object, since identity is the hash — see
+> [`ContentHasher`](../reference/api.md#contenthasher).
 
 What identity is **not**:
 
@@ -90,16 +102,18 @@ second.assetContentId().equals(first.assetContentId());  // true
 On the second call dedup4j hashes the content, finds an existing row, uploads
 nothing, and returns a reference to the object already stored.
 
-!!! tip "A duplicate store already counts for you"
-    `store` returning `duplicate: true` has **already incremented** the
-    reference count. New content is created at a count of one; a duplicate
-    store retains the existing content.
-
-    So the rule is symmetric: **every `store` call yields exactly one
-    reference, and needs exactly one matching
-    [`release`](lifecycle.md#retain-and-release).** Do not call `retain` after
-    a duplicate store — that would count the same record twice, and the
-    content would never be deleted.
+> [!TIP]
+> **A duplicate store already counts for you**
+>
+> `store` returning `duplicate: true` has **already incremented** the
+> reference count. New content is created at a count of one; a duplicate
+> store retains the existing content.
+>
+> So the rule is symmetric: **every `store` call yields exactly one
+> reference, and needs exactly one matching
+> [`release`](lifecycle.md#retain-and-release).** Do not call `retain` after
+> a duplicate store — that would count the same record twice, and the
+> content would never be deleted.
 
 `retain` is for the other case: a **new record pointing at content you did not
 just store**, such as copying an existing attachment onto a second document
@@ -146,10 +160,12 @@ for (BatchStoreOutcome outcome : result.outcomes()) {
 back to the exact input — necessary when several uploads share a filename or
 when the filename is absent.
 
-!!! danger "Check `failures()`"
-    Treating a `BatchStoreResult` as success because the call returned is the
-    easiest mistake to make here. The call returning means the *batch* ran, not
-    that every file stored. Use `allSucceeded()` before assuming.
+> [!CAUTION]
+> **Check `failures()`**
+>
+> Treating a `BatchStoreResult` as success because the call returned is the
+> easiest mistake to make here. The call returning means the *batch* ran, not
+> that every file stored. Use `allSucceeded()` before assuming.
 
 ## What dedup4j does not do on upload
 
