@@ -5,6 +5,7 @@ import { Footer } from './components/Footer'
 import { DocsPage } from './components/DocsPage'
 import { LandingPage } from './components/LandingPage'
 import { NotFound } from './components/NotFound'
+import { SearchPalette } from './components/SearchPalette'
 import { Seo } from './components/Seo'
 
 export default function App() {
@@ -33,7 +34,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-      {searchOpen && null}
+      {searchOpen && <SearchPalette onClose={() => setSearchOpen(false)} />}
     </div>
   )
 }
