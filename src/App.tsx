@@ -6,6 +6,7 @@ import { DocsPage } from './components/DocsPage'
 import { LandingPage } from './components/LandingPage'
 import { NotFound } from './components/NotFound'
 import { SearchPalette } from './components/SearchPalette'
+import { ScrollManager } from './components/ScrollManager'
 import { Seo } from './components/Seo'
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <Seo />
+      <ScrollManager />
       <Navigation onSearch={() => setSearchOpen(true)} />
       <main className="flex-grow">
         <Routes>

@@ -56,3 +56,13 @@ describe('highlighting (Review Focus 4)', () => {
     }
   })
 })
+
+describe('highlighting produces tokens', () => {
+  it('colours common languages and groovy', async () => {
+    expect(await html('```java\npublic class A {}\n```')).toContain('hljs-keyword')
+    expect(await html('```yaml\nkey: value\n```')).toContain('hljs-attr')
+    expect(await html('```xml\n<a b="c"/>\n```')).toContain('hljs-tag')
+    expect(await html("```groovy\ndef x = 'y'\n```")).toContain('hljs-')
+  })
+})
+
