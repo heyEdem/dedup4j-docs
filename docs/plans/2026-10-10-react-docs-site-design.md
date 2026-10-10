@@ -90,3 +90,16 @@ Versioned docs, i18n, an About/architecture-diagram page, publishing
 
 - Vercel project and domain setup is manual (owner).
 - `VERIFICATION.md` and `README.md` need updating for the new stack.
+
+## Amendments (from the implementation plan)
+
+- `includes/*` snippets stay as `--8<-- "file.md"` lines expanded at load time
+  (single source preserved, no page rewrite) instead of a `<Dependency />`
+  component. Expansion skips fenced code so pages can document the syntax.
+- Alerts use GitHub alert syntax with a bold first line as the title.
+- Code highlighting (`rehype-highlight`) is included; MkDocs had it.
+- The external link check (`docs-links.yml`, lychee, weekly) is kept and
+  repointed at `src/docs/`; internal links are checked by the build.
+- A CI workflow runs tests and the build on push and pull requests.
+- Rendering is verified in headless Chrome against a fresh build: all routes
+  hydrate with no React hydration errors.

@@ -138,7 +138,7 @@ Each is a decision for the maintainer, not something the site can fix.
 | D1 | Build stays green | `BUILD SUCCESS` on 2026-09-26 | ✅ verified |
 | D2 | **Test count unchanged at 190** | 190 before the rename, 190 after, 0 failures | ✅ verified |
 | D3 | Module count unchanged at 11 | reactor summary | ✅ verified |
-| D4 | Site still builds | `mkdocs build --strict` in this repo | ✅ green |
+| D4 | Site still builds | `npm run build` in this repo | ✅ green |
 | D5 | Examples actually compile | isolated consumer project — gate G6 | ⬜ not run |
 
 ## E. Documentation edits owed once the rename lands
@@ -149,7 +149,7 @@ Nothing here is blocked; all of it is mechanical once A and B are done.
 - [x] Re-run `./mvnw clean verify` — 11 modules / 190 tests, green.
 - [x] `reference/configuration.md` now documents the renamed defaults.
 - [ ] `guides/spring-boot.md` — confirm the auto-configuration class names.
-- [ ] `docs/includes/coordinates.md` — `groupId` at gate G0.
+- [ ] `src/docs/_includes/coordinates.md` — `groupId` at gate G0.
 - [ ] Remove the "not yet on Maven Central" admonition at gate G7.
 
 ---

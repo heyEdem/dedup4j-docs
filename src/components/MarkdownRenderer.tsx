@@ -9,16 +9,17 @@ import { CodeBlock } from './CodeBlock'
 
 export function MarkdownRenderer({ body, fromId }: { body: string; fromId: string }) {
   const components: Components = {
-    h2: ({ node: _n, children }) => <h2 id={headingId(children)}>{children}</h2>,
-    h3: ({ node: _n, children }) => <h3 id={headingId(children)}>{children}</h3>,
-    pre: ({ node: _n, children }) => <CodeBlock>{children}</CodeBlock>,
+    h2: ({ children }) => <h2 id={headingId(children)}>{children}</h2>,
+    h3: ({ children }) => <h3 id={headingId(children)}>{children}</h3>,
+    pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- `node` must not reach the DOM
     div: ({ node: _n, children, ...props }) => {
       const p = props as Record<string, string>
       if (p['data-tabs']) return <Tabs>{children}</Tabs>
       if (p['data-alert']) return <Alert kind={p['data-alert']}>{children}</Alert>
       return <div {...props}>{children}</div>
     },
-    a: ({ node: _n, href = '', children }) => {
+    a: ({ href = '', children }) => {
       const link = resolveLink(href, fromId)
       if (link.kind === 'external') {
         return <a href={link.href} target="_blank" rel="noreferrer noopener">{children}</a>
@@ -26,7 +27,7 @@ export function MarkdownRenderer({ body, fromId }: { body: string; fromId: strin
       if (link.kind === 'hash') return <a href={link.href}>{children}</a>
       return <Link to={link.href}>{children}</Link>
     },
-    table: ({ node: _n, children }) => (
+    table: ({ children }) => (
       <div className="table-wrap"><table>{children}</table></div>
     ),
   }
