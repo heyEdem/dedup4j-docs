@@ -19,10 +19,10 @@ already uses.
 
 | Metric | Meaning |
 |---|---|
-| `dedup4j.uploads` | store operations attempted |
+| `dedup4j.uploads` | completed uploads; incremented only after the transaction commits, so failed uploads are not counted |
 | `dedup4j.duplicates` | stores that matched existing content |
 | `dedup4j.storage.writes` | writes that actually reached the object store |
-| `dedup4j.skipped.physical.writes` | writes avoided by deduplication |
+| `dedup4j.skipped.physical.writes` | completed uploads where this request performed no storage write |
 | `dedup4j.bytes.accepted` | bytes submitted |
 | `dedup4j.bytes.avoided` | **bytes not stored because of deduplication** |
 | `dedup4j.hashing` | content hashing timing |
@@ -42,6 +42,37 @@ already uses.
 > survived: bytes you are paying for that nothing points at. Nothing retries
 > it automatically. Non-zero here is a cleanup backlog, and it only grows.
 
+## Upload history
+
+Micrometer counters live in one process and reset when it restarts. For
+numbers that survive restarts, dedup4j keeps an append-only upload history in
+your application's database. It is on by default.
+
+- **All-time totals per application dataset.** Uploads, duplicates, physical
+  writes, logical bytes and storage avoided belong to the dataset (`datasetId`),
+  not to a process. Restarts do not reset them, and replicas sharing a
+  database report the same totals.
+- **Totals start at zero on upgrade.** There is no backfill from existing
+  content.
+- **Failures are persisted.** Failed uploads and failed physical deletes are
+  recorded and shown under "Recent failures" in the management endpoint and
+  both dashboards. Failed uploads are never counted in the totals.
+
+**Storage avoided** is the number to quote. It is the bytes that did not become
+an additional stored copy: the sum of the sizes of duplicate outcomes. A
+duplicate that lost an insert race still counts, even though its bytes were
+sent to storage once, because the same key was overwritten rather than
+duplicated. It measures capacity saved, not upload traffic saved.
+
+> [!WARNING]
+> **PostgreSQL and H2 only**
+>
+> The history is enforced append-only by the database, which dedup4j
+> implements for PostgreSQL and H2. On any other database startup fails unless
+> you set `dedup4j.history.enabled=false`. With history disabled the totals
+> fall back to counters **since application start**, and the dashboards say so.
+> See [Configuration properties](../reference/configuration.md#upload-history).
+
 ## Management endpoints
 
 Add `dedup4j-spring-boot-management` and opt in:
@@ -59,7 +90,18 @@ dedup4j:
 | `enabled` | `false` — opt in deliberately |
 | `base-path` | `/dedup4j/management` |
 | `instance-name` | `dedup4j` |
-| `instance-id` | a random UUID per application instance |
+| `instance-id` | a random UUID per application start, the same id history rows use unless `dedup4j.history.instance-id` is set |
+
+`/metrics` now reports `datasetId`, `totalsScope` (`all-time` or
+`since-start`) and `physicalWrites` alongside the existing totals, and `/info`
+reports `datasetId`.
+
+`/failures` has two modes:
+
+| Request | Returns |
+|---|---|
+| `?since=` | Newest first, for display |
+| `?afterSequence=&limit=` | Ascending by sequence number, for ingestion. `limit` defaults to 100, maximum 500 |
 
 > [!CAUTION]
 > **These endpoints are not secured by dedup4j**
@@ -87,6 +129,10 @@ Note the default: **`enabled` is `true`**. Adding the dependency is the
 decision; the property is how you turn it back off. Same security caveat as
 above — read-only means it will not change your data, not that it is safe to
 expose.
+
+The embedded dashboard shows the history totals and the persisted failures
+even when the management endpoints are disabled. A caption under the headline
+number says whether the totals are *all time* or *since application start*.
 
 `failure-lookback` bounds how far back the failure view reads. Longer windows
 mean heavier queries.
@@ -132,6 +178,25 @@ java -jar dedup4j-dashboard.jar
 
 It keeps its own SQLite database for polled history and does not write to your
 application's database.
+
+With upload history in place the dashboard:
+
+- **counts each dataset once**, so replicas sharing a database are not added
+  together. They show a "shared dataset" badge;
+- **starts from a zero baseline** after a dashboard restart, rather than
+  re-adding all-time totals as new activity;
+- **ingests failures per dataset** through a cursor over `afterSequence`,
+  attributed to the instance where each happened;
+- captions the headline as *all time*, *since application start*, or *some
+  datasets since application start* when the two are mixed;
+- treats an older instance that reports no `datasetId` as its own dataset.
+
+> [!WARNING]
+> **Upgrade the standalone dashboard before, or together with, the applications**
+>
+> An older dashboard polling upgraded applications multiplies trends by the
+> replica count and, after each dashboard restart, re-adds the all-time totals
+> as a single delta.
 
 ### Registration
 
