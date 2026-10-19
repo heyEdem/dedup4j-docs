@@ -244,6 +244,68 @@ public record ReconciliationReport(
 `LogicalReferenceCountSource` is a functional interface: you tell dedup4j what
 the counts *should* be, because it cannot enumerate your records.
 
+## Upload history
+
+`UploadHistory` (`com.edem.dedup4j.history`) is an auto-configured bean,
+declared `@ConditionalOnMissingBean`. It reads the persistent record of
+completed uploads and failures. See
+[Observability & dashboards](../guides/observability.md#upload-history).
+
+```java
+public interface UploadHistory {
+    HistoryTotals totals();
+    List<FailureRecord> recentFailures(Instant since, int limit);   // newest first, for display
+    List<FailureRecord> failuresAfter(long afterSequenceNo, int limit); // ascending, for paging
+    boolean persistent();
+}
+
+public record HistoryTotals(
+    String scope, String datasetId,
+    long uploads, long duplicates, long physicalWrites,
+    long logicalBytes, long avoidedBytes
+) {
+    long newUploads();              // uploads - duplicates
+    long skippedPhysicalWrites();   // uploads - physicalWrites
+}
+
+public record FailureRecord(
+    long sequenceNo, UUID id, Instant recordedAt, String operation,
+    String message, String instanceId, String contentHash, String objectKey
+) {}
+```
+
+- `scope` is `"all-time"` (persistent ledger) or `"since-start"` (history
+  disabled; process-local counters). `datasetId` is `null` when the totals are
+  not tied to a dataset.
+- `operation` is `upload` or `delete`.
+- Page failures for ingestion with `failuresAfter`, using the last
+  `sequenceNo` you saw as the cursor. `recentFailures` is for display only.
+- `persistent()` is `false` when history is disabled.
+
+The interface also declares `recordUpload` and `recordFailure`, which the
+library calls itself. Do not call them from application code: an upload
+recorded outside the library's transaction is a total that never happened.
+
+### `FailureSource`
+
+`Dedup4jManagementSnapshot.FailureSource` (management module) feeds the
+management failures endpoint. Implement it to supply your own failures.
+
+```java
+@FunctionalInterface
+public interface FailureSource {
+    List<Failure> recentFailures(Instant since);
+
+    default List<Failure> failuresAfter(long afterSequence, int limit) {
+        return List.of();
+    }
+}
+```
+
+`failuresAfter` defaults to an empty list, meaning the source does not support
+sequence paging; `?afterSequence=` then returns nothing and only
+`recentFailures` serves its failures.
+
 ## Exceptions
 
 All unchecked. See [Troubleshooting](troubleshooting.md).
