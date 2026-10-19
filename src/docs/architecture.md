@@ -117,6 +117,37 @@ existing one, enforced by a unique constraint on content identity.
 This is why `ObjectKeyStrategy` must be deterministic. A strategy with
 randomness in it turns a harmless duplicate write into two divergent objects.
 
+## The upload history ledger
+
+Totals and failures live in an append-only history in your application's
+database: three tables, `dedup4j_history_dataset` (one row, the dataset
+identity), `dedup4j_upload_event` (the upload ledger) and
+`dedup4j_failure_event`.
+
+- **Immutability is enforced by the database.** PostgreSQL uses row triggers
+  and a `TRUNCATE` trigger. H2 uses row triggers, and foreign-key references
+  block `TRUNCATE`. Entities are immutable and repositories can only append
+  and read. This is why history supports only PostgreSQL and H2.
+- **A dataset-row lock gives a gapless sequence.** Each upload locks the
+  dataset row, reads the latest committed ledger row and appends the next one
+  with running totals, holding the lock until commit. Reading totals is one
+  row read.
+- **Failures are recorded after the failed transaction.** The upload's own
+  transaction rolled back, so the failure is appended in a separate
+  transaction. Micrometer meters likewise increment only after commit.
+- **READ COMMITTED is required.** The gapless sequence relies on it, so the
+  history appends request it. If the transaction manager rejects a custom
+  isolation level, dedup4j logs `event=history.isolation.unsupported` once and
+  appends at the database default, which is correct on the PostgreSQL and H2
+  defaults.
+- **Corrections are compensating rows.** A mistake is fixed by appending a row
+  that negates and references the original. Nothing updates or deletes
+  history.
+
+The cost is that uploads serialise on the dataset row for the few statements
+between the ledger insert and commit, negligible at thousands of uploads per
+day.
+
 ## What dedup4j does not do
 
 | Not provided | Why |
