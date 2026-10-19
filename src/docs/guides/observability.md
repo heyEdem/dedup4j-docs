@@ -56,7 +56,9 @@ your application's database. It is on by default.
   content.
 - **Failures are persisted.** Failed uploads and failed physical deletes are
   recorded and shown under "Recent failures" in the management endpoint and
-  both dashboards. Failed uploads are never counted in the totals.
+  both dashboards. Failed uploads are never counted in the totals. With
+  history disabled, failures are neither recorded nor shown, and "Recent
+  failures" stays empty.
 
 **Storage avoided** is the number to quote. It is the bytes that did not become
 an additional stored copy: the sum of the sizes of duplicate outcomes. A
@@ -71,6 +73,7 @@ duplicated. It measures capacity saved, not upload traffic saved.
 > implements for PostgreSQL and H2. On any other database startup fails unless
 > you set `dedup4j.history.enabled=false`. With history disabled the totals
 > fall back to counters **since application start**, and the dashboards say so.
+> Failures are not recorded either, so "Recent failures" stays empty.
 > See [Configuration properties](../reference/configuration.md#upload-history).
 
 ## Management endpoints
@@ -100,8 +103,11 @@ reports `datasetId`.
 
 | Request | Returns |
 |---|---|
-| `?since=` | Newest first, for display |
-| `?afterSequence=&limit=` | Ascending by sequence number, for ingestion. `limit` defaults to 100, maximum 500 |
+| `?since=&limit=` | Newest first, for display. Without `limit`, at most 100 rows |
+| `?afterSequence=&limit=` | Ascending by sequence number, for ingestion |
+
+`limit` applies to both modes: it defaults to 100 and is clamped to 1..500.
+`afterSequence` below 0 is treated as 0.
 
 > [!CAUTION]
 > **These endpoints are not secured by dedup4j**

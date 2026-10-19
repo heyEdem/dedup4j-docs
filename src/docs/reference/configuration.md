@@ -73,9 +73,9 @@ used — see [Storage providers](../guides/providers.md#credentials).
 database. Against any other database it creates nothing. See
 [Spring Boot integration](../guides/spring-boot.md#schema-initialisation).
 
-The upload-history changelog follows the same mode, with one difference: under
-`embedded` it runs only on an in-memory H2 database (`jdbc:h2:mem:`), not on an
-H2 file or server database. See [Upload history](#upload-history).
+The upload-history changelog follows the same mode. Under `embedded`, both
+changelogs run only on an in-memory H2 database (`jdbc:h2:mem:`), not on an H2
+file or server database. See [Upload history](#upload-history).
 
 ## Upload history
 

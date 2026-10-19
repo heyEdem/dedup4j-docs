@@ -304,7 +304,10 @@ public interface FailureSource {
 
 `failuresAfter` defaults to an empty list, meaning the source does not support
 sequence paging; `?afterSequence=` then returns nothing and only
-`recentFailures` serves its failures.
+`recentFailures` serves its failures. Such a source also gets none of its
+failures into the standalone dashboard: the dashboard ingests by an
+`afterSequence` cursor, and falls back to `since` only when the items it
+receives lack a `sequenceNo`. An empty page is not that case.
 
 ## Exceptions
 

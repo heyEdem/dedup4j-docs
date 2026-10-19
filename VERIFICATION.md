@@ -154,28 +154,28 @@ Nothing here is blocked; all of it is mechanical once A and B are done.
 
 ---
 
-## F. Persistent upload history
+## G. Persistent upload history
 
 Claims added for the upload history feature, read against library branch
-`feat/persistent-upload-history` at `76b0d46 fix(history): track history migrations in their own changelog tables` (PR #62, not merged).
+`feat/persistent-upload-history` at `1496388` (PR #62, not merged).
 
 | # | Claim | Location | Status |
 |---|---|---|---|
-| F4 | `dedup4j.history.enabled` defaults to `true` | `Dedup4jHistoryAutoConfiguration` (`matchIfMissing = true`) | ✅ verified |
-| F5 | `history.instance-id` falls back to `management.instance-id`, then `DefaultInstanceId` (one random UUID per JVM, also the management default) | `Dedup4jHistoryAutoConfiguration`, `DefaultInstanceId`, `Dedup4jManagementProperties` | ✅ verified |
-| F6 | Unsupported database error text | `HistoryDatabaseGuard` | ✅ verified |
-| F7 | Missing history tables error text and changelog path | `Dedup4jSchemaValidator.validateHistory` | ✅ verified |
-| F8 | History changelog has its own `DEDUP4J_HISTORY_DATABASE_CHANGELOG` / `_LOCK` tables | `Dedup4jHistoryAutoConfiguration` | ✅ verified |
-| F9 | `/failures`: `afterSequence` ascending, default 100, max 500; `since` newest first | `Dedup4jManagementController`, `UploadHistoryFailureSource` | ✅ verified |
-| F10 | `/metrics` adds `datasetId`, `totalsScope`, `physicalWrites`; `/info` adds `datasetId` | `Dedup4jManagementSnapshot` | ✅ verified |
-| F11 | `UploadHistory`, `HistoryTotals`, `FailureRecord`, `FailureSource.failuresAfter` default shape | `history/*`, `Dedup4jManagementSnapshot` | ✅ verified |
-| F12 | `dedup4j.uploads` and `dedup4j.skipped.physical.writes` increment after commit; failed uploads not counted | `Dedup4jMetrics.recordUpload` | ✅ verified (javadoc and body; commit timing is stated by the library docs, not re-run) |
-| F13 | PostgreSQL triggers incl. `TRUNCATE`; H2 triggers plus FK-blocked `TRUNCATE`; READ COMMITTED fallback behaviour | library README and `docs/implementation.md` | ⬜ taken from library docs, changelog SQL and tests not re-read |
-| F14 | Standalone dashboard behaviour (once per dataset, zero baseline, per-dataset cursor, badges, captions) | library README and `dashboard.js` captions | ⬜ captions read; ingestion logic taken from library docs |
+| G1 | `dedup4j.history.enabled` defaults to `true` | `Dedup4jHistoryAutoConfiguration` (`matchIfMissing = true`) | ✅ verified |
+| G2 | `history.instance-id` falls back to `management.instance-id`, then `DefaultInstanceId` (one random UUID per JVM, also the management default) | `Dedup4jHistoryAutoConfiguration`, `DefaultInstanceId`, `Dedup4jManagementProperties` | ✅ verified |
+| G3 | Unsupported database error text | `HistoryDatabaseGuard` | ✅ verified |
+| G4 | Missing history tables error text and changelog path | `Dedup4jSchemaValidator.validateHistory` | ✅ verified |
+| G5 | History changelog has its own `DEDUP4J_HISTORY_DATABASE_CHANGELOG` / `_LOCK` tables | `Dedup4jHistoryAutoConfiguration` | ✅ verified |
+| G6 | `/failures`: `limit` default 100, clamped 1..500, applies to both modes; `afterSequence` ascending; `since` newest first | `Dedup4jManagementController`, `UploadHistoryFailureSource` | ✅ verified |
+| G7 | `/metrics` adds `datasetId`, `totalsScope`, `physicalWrites`; `/info` adds `datasetId` | `Dedup4jManagementSnapshot` | ✅ verified |
+| G8 | `UploadHistory`, `HistoryTotals`, `FailureRecord`, `FailureSource.failuresAfter` default shape | `history/*`, `Dedup4jManagementSnapshot` | ✅ verified |
+| G9 | `dedup4j.uploads` and `dedup4j.skipped.physical.writes` increment after commit; failed uploads not counted | `Dedup4jMetrics.recordUpload` | ✅ verified (javadoc and body; commit timing is stated by the library docs, not re-run) |
+| G10 | PostgreSQL triggers incl. `TRUNCATE`; H2 triggers plus FK-blocked `TRUNCATE`; READ COMMITTED fallback behaviour | library README and `docs/implementation.md` | ✅ verified: PostgreSQL row and `TRUNCATE` triggers in `002-append-only-postgresql.yaml`; H2 row triggers in `003-append-only-h2.yaml` with FK self-references blocking `TRUNCATE` (`AbstractHistorySchemaTest.truncateRejected`); READ COMMITTED pin and one-time `event=history.isolation.unsupported` fallback in `SpringTransactionalBlobDeduplicationService` and `JpaUploadHistory` |
+| G11 | Standalone dashboard behaviour (once per dataset, zero baseline, per-dataset cursor, badges, captions) | `InstancePollingService`, `dashboard.js` | ✅ verified: per-dataset `afterSequence` cursor with fallback to `since` only when items lack `sequenceNo`; captions read |
 
-Library `docs/implementation.md` still lists the history `instance-id`
-fallback as "then host name"; the code and changelog say the shared random id.
-This site follows the code.
+The earlier mismatch on the history `instance-id` fallback (library
+`docs/implementation.md` said "host name") is resolved at `1496388`: both the
+code and the library docs use the shared per-JVM `DefaultInstanceId`.
 
 ---
 
