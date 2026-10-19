@@ -154,6 +154,31 @@ Nothing here is blocked; all of it is mechanical once A and B are done.
 
 ---
 
+## F. Persistent upload history
+
+Claims added for the upload history feature, read against library branch
+`feat/persistent-upload-history` at `76b0d46 fix(history): track history migrations in their own changelog tables` (PR #62, not merged).
+
+| # | Claim | Location | Status |
+|---|---|---|---|
+| F4 | `dedup4j.history.enabled` defaults to `true` | `Dedup4jHistoryAutoConfiguration` (`matchIfMissing = true`) | ✅ verified |
+| F5 | `history.instance-id` falls back to `management.instance-id`, then `DefaultInstanceId` (one random UUID per JVM, also the management default) | `Dedup4jHistoryAutoConfiguration`, `DefaultInstanceId`, `Dedup4jManagementProperties` | ✅ verified |
+| F6 | Unsupported database error text | `HistoryDatabaseGuard` | ✅ verified |
+| F7 | Missing history tables error text and changelog path | `Dedup4jSchemaValidator.validateHistory` | ✅ verified |
+| F8 | History changelog has its own `DEDUP4J_HISTORY_DATABASE_CHANGELOG` / `_LOCK` tables | `Dedup4jHistoryAutoConfiguration` | ✅ verified |
+| F9 | `/failures`: `afterSequence` ascending, default 100, max 500; `since` newest first | `Dedup4jManagementController`, `UploadHistoryFailureSource` | ✅ verified |
+| F10 | `/metrics` adds `datasetId`, `totalsScope`, `physicalWrites`; `/info` adds `datasetId` | `Dedup4jManagementSnapshot` | ✅ verified |
+| F11 | `UploadHistory`, `HistoryTotals`, `FailureRecord`, `FailureSource.failuresAfter` default shape | `history/*`, `Dedup4jManagementSnapshot` | ✅ verified |
+| F12 | `dedup4j.uploads` and `dedup4j.skipped.physical.writes` increment after commit; failed uploads not counted | `Dedup4jMetrics.recordUpload` | ✅ verified (javadoc and body; commit timing is stated by the library docs, not re-run) |
+| F13 | PostgreSQL triggers incl. `TRUNCATE`; H2 triggers plus FK-blocked `TRUNCATE`; READ COMMITTED fallback behaviour | library README and `docs/implementation.md` | ⬜ taken from library docs, changelog SQL and tests not re-read |
+| F14 | Standalone dashboard behaviour (once per dataset, zero baseline, per-dataset cursor, badges, captions) | library README and `dashboard.js` captions | ⬜ captions read; ingestion logic taken from library docs |
+
+Library `docs/implementation.md` still lists the history `instance-id`
+fallback as "then host name"; the code and changelog say the shared random id.
+This site follows the code.
+
+---
+
 ## Legend
 
 ✅ verified against source · ❌ known outstanding · ⬜ unverified
