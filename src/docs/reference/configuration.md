@@ -70,8 +70,28 @@ used — see [Storage providers](../guides/providers.md#credentials).
 | `initialize-schema` | `embedded` | `embedded`, `always`, or `never` |
 
 `embedded` initialises the schema **only** when the `DataSource` is an embedded
-database. Against Postgres or MySQL it creates nothing. See
+database. Against any other database it creates nothing. See
 [Spring Boot integration](../guides/spring-boot.md#schema-initialisation).
+
+The upload-history changelog follows the same mode, with one difference: under
+`embedded` it runs only on an in-memory H2 database (`jdbc:h2:mem:`), not on an
+H2 file or server database. See [Upload history](#upload-history).
+
+## Upload history
+
+`dedup4j.history.*`
+
+| Property | Default | Notes |
+|---|---|---|
+| `enabled` | `true` | Durable append-only upload history. **PostgreSQL and H2 only** |
+| `instance-id` | `dedup4j.management.instance-id`, then a random UUID per start | Attribution label on history rows; totals never group by it |
+
+Any database other than PostgreSQL or H2 fails startup unless
+`enabled: false`. With history disabled, totals are counted since application
+start. The history changelog,
+`classpath:db/dedup4j/history/db.changelog-history.yaml`, has its own tracking
+tables (`DEDUP4J_HISTORY_DATABASE_CHANGELOG` and `_LOCK`). See
+[Observability & dashboards](../guides/observability.md#upload-history).
 
 ## Deduplication
 
@@ -103,7 +123,7 @@ database. Against Postgres or MySQL it creates nothing. See
 | `enabled` | `false` | Opt in deliberately |
 | `base-path` | `/dedup4j/management` | Mount point |
 | `instance-name` | `dedup4j` | Label for this instance |
-| `instance-id` | random UUID | Regenerated on every restart |
+| `instance-id` | random UUID | Regenerated on every restart; shared with history rows unless `dedup4j.history.instance-id` is set |
 
 ## Embedded dashboard
 
