@@ -63,8 +63,8 @@ dedup4j:
     initialize-schema: embedded    # the default
 ```
 
-`embedded` creates the schema **only** for embedded databases. Against
-Postgres or MySQL it creates nothing.
+`embedded` creates the schema **only** for embedded databases. Against an
+external database it creates nothing.
 
 Pick one:
 
@@ -74,6 +74,33 @@ Pick one:
 | Production | `initialize-schema: never` and apply the schema with your own migration tool |
 
 Production schema changes belong to your migration pipeline, not to a library.
+
+### `dedup4j history requires PostgreSQL or H2, but the database is '<product>'`
+
+The full message ends `Set dedup4j.history.enabled=false to run without
+persistent history.` Upload history is on by default and is enforced
+append-only by database triggers that exist only for PostgreSQL and H2. On any
+other database, disable it:
+
+```yaml
+dedup4j:
+  history:
+    enabled: false
+```
+
+Totals then count since application start instead of all time.
+
+### `dedup4j history tables are missing or incomplete`
+
+The full message reads `... for initialize-schema mode '<mode>'. Apply
+classpath:db/dedup4j/history/db.changelog-history.yaml, or set
+dedup4j.history.enabled=false to run without persistent history.`
+
+The history changelog runs automatically only with `initialize-schema:
+always`, or `embedded` on an in-memory H2 database. On PostgreSQL, or an H2
+file or server database, under `embedded` or `never`, apply the changelog
+yourself. It tracks itself in `DEDUP4J_HISTORY_DATABASE_CHANGELOG` and
+`DEDUP4J_HISTORY_DATABASE_CHANGELOG_LOCK`, separate from the asset changelog.
 
 ### No `BlobStorage` bean
 

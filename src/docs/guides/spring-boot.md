@@ -80,10 +80,23 @@ dedup4j:
 > **`embedded` does not mean 'on'**
 >
 > The name describes *when* it acts, not that it is enabled. Pointing a
-> default configuration at Postgres or MySQL creates **no tables**, and the
-> first store fails on a missing table. That is intentional — silently
+> default configuration at a non-embedded database (PostgreSQL, for example)
+> creates **no tables**, and startup fails on the missing schema. That is intentional — silently
 > running DDL against a production database is worse — but it surprises
 > people.
+
+### Upload history needs PostgreSQL or H2
+
+Persistent upload history is **on by default** and supports only PostgreSQL
+and H2. On any other database startup fails unless you set
+`dedup4j.history.enabled=false`.
+
+Its changelog runs automatically only with `always`, or with `embedded` on an
+in-memory H2 database. With `embedded` (the default) on an external database,
+or with `never`, also apply
+`classpath:db/dedup4j/history/db.changelog-history.yaml`. It has its own
+tracking tables, `DEDUP4J_HISTORY_DATABASE_CHANGELOG` and `_LOCK`. See
+[Observability & dashboards](observability.md#upload-history).
 
 For anything beyond development, prefer `never` and manage the schema with
 your existing migration tool. A library should not be the thing that alters

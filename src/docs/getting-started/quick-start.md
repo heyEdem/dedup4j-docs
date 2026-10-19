@@ -38,8 +38,12 @@ Two things are happening:
   credentials.
 - The schema is created for you. `dedup4j.persistence.initialize-schema`
   defaults to `EMBEDDED`, which initialises the schema **only** when the
-  `DataSource` is an embedded database. Against Postgres or MySQL nothing is
+  `DataSource` is an embedded database. Against an external database nothing is
   created unless you set `ALWAYS`.
+- Upload history is on by default and supports only **PostgreSQL and H2**. On
+  another database, set `dedup4j.history.enabled=false` or startup fails. With
+  `EMBEDDED` on an external database, or `NEVER`, also apply
+  `classpath:db/dedup4j/history/db.changelog-history.yaml`.
 
 > [!NOTE]
 > **Set the storage directory explicitly**
