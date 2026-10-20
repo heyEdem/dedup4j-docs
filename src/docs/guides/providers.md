@@ -122,23 +122,48 @@ dedup4j:
     provider: azure
     azure:
       container: application-blobs
-      account-name: mystorageaccount
+      endpoint: ${AZURE_BLOB_SAS_URL}   # or connection-string
 ```
+
+`container` plus **one of** `endpoint` or `connection-string` is required.
+With only `container` and `account-name`, startup fails with
+`connectionString or endpoint must be configured`.
 
 | Property | Meaning |
 |---|---|
 | `container` | Target container. Must already exist |
-| `account-name` | Storage account name |
-| `endpoint` | Custom endpoint, e.g. Azurite |
-| `connection-string` | Full connection string — **development only** |
+| `endpoint` | Service URL. dedup4j sets no credential, so it must carry a SAS token (or point at Azurite). Overrides the endpoint inside `connection-string` when both are set |
+| `connection-string` | Full connection string, with an account key or a SAS |
+| `account-name` | Accepted but **not used** in 0.1.0 |
+
+### Authentication
+
+dedup4j 0.1.0 does **not** configure a managed identity or any other Azure
+credential for you. Three ways work:
+
+1. **`connection-string`**: simplest; fine against Azurite.
+2. **`endpoint` with a SAS token** in its query string.
+3. **Your own client.** Declare a `BlobContainerClient` bean and dedup4j uses
+   it instead of building one. This is how to use a managed identity today:
+
+```java
+@Bean
+BlobContainerClient blobContainerClient() {
+    return new BlobServiceClientBuilder()
+            .endpoint("https://mystorageaccount.blob.core.windows.net")
+            .credential(new DefaultAzureCredentialBuilder().build()) // azure-identity
+            .buildClient()
+            .getBlobContainerClient("application-blobs");
+}
+```
+
+`container` is still required when you supply your own client.
 
 > [!CAUTION]
-> **connection-string carries an embedded key**
+> **Connection strings and SAS URLs are credentials**
 >
-> A connection string contains an account key in plaintext. Use it against
-> Azurite locally; in production prefer a managed identity and supply
-> `account-name` and `endpoint`. A connection string in `application.yaml`
-> is a credential in version control.
+> Both embed a secret in plaintext. Supply them from the environment or a
+> secret store, never from a committed `application.yaml`.
 
 ## Custom providers
 
@@ -184,7 +209,7 @@ Contract notes:
 | | Local | S3 | Azure |
 |---|---|---|---|
 | Multi-node | ❌ | ✅ | ✅ |
-| Credentials | none | default chain | managed identity or connection string |
+| Credentials | none | default chain | connection string, SAS endpoint, or your own client |
 | Custom endpoint | — | ✅ | ✅ |
 | Best for | development, tests | production | production on Azure |
 

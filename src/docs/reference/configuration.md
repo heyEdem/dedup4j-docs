@@ -57,9 +57,9 @@ used — see [Storage providers](../guides/providers.md#credentials).
 | Property | Default | Notes |
 |---|---|---|
 | `container` | *none* | **Required** when `provider=azure` |
-| `account-name` | *none* | Storage account name |
-| `endpoint` | *none* | Custom endpoint, e.g. Azurite |
-| `connection-string` | *none* | **Development only** — embeds an account key |
+| `account-name` | *none* | Accepted but not used in 0.1.0 |
+| `endpoint` | *none* | Service URL carrying a SAS, or Azurite. One of `endpoint` or `connection-string` is required |
+| `connection-string` | *none* | Embeds an account key or SAS; keep it out of committed config |
 
 ## Persistence
 

@@ -53,6 +53,13 @@ dedup4j:
 Failing at startup is deliberate — the alternative is discovering it on the
 first upload in production.
 
+### `connectionString or endpoint must be configured`
+
+You selected Azure with `container` and `account-name` only. `account-name` is
+not used in 0.1.0; set `endpoint` (with a SAS) or `connection-string`, or
+declare your own `BlobContainerClient` bean. See
+[Storage providers](../guides/providers.md#authentication).
+
 ### `dedup4j schema table 'dedup4j_asset_content' is missing`
 
 The schema was never created. Almost always this:
