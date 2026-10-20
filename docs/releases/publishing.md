@@ -5,8 +5,8 @@
 > `[ ]` pending, `[~]` in progress, `[x]` complete.
 
 **Status:** G0 complete; G1–G3 implemented on library branch
-`chore/release-0.1.0-prep` (not pushed); G4–G7 not started
-**Last reviewed:** 2026-10-19
+`chore/release-0.1.0-prep` (not pushed); G4–G6 passed locally; G7 not started
+**Last reviewed:** 2026-10-20
 **Project:** dedup4j (formerly Blob Helper)
 **Canonical location:** `blob-helper-docs/docs/releases/publishing.md`
 **Scope decision:** see
@@ -449,8 +449,8 @@ for exactly the approved components, and excludes the standalone dashboard.
 
 **Effort: 2–4 hours.**
 
-- [ ] Generate a Central Portal **user token**; never use the account password.
-- [ ] Add the token locally under server ID `central` in `~/.m2/settings.xml`:
+- [x] Generate a Central Portal **user token**; never use the account password.
+- [x] Add the token locally under server ID `central` in `~/.m2/settings.xml`:
 
 ```xml
 <server>
@@ -460,14 +460,15 @@ for exactly the approved components, and excludes the standalone dashboard.
 </server>
 ```
 
-- [ ] Generate or select a passphrase-protected OpenPGP signing key.
-- [ ] Record the key fingerprint in private maintainer records.
-- [ ] Publish the public key to a Central-supported server such as
+- [x] Generate or select a passphrase-protected OpenPGP signing key.
+- [x] Record the key fingerprint in private maintainer records
+  (`~/Documents/dedup4j-0.1.0-release-roadmap.md`).
+- [x] Publish the public key to a Central-supported server such as
   `keyserver.ubuntu.com`, `keys.openpgp.org`, or `pgp.mit.edu`.
-- [ ] **Verify the public key can be retrieved independently by fingerprint.**
+- [x] **Verify the public key can be retrieved independently by fingerprint.**
   Cheap, and it is the only thing that proves your signatures are verifiable by
   anyone other than you.
-- [ ] Store the private key and passphrase outside source control. Supply the
+- [x] Store the private key and passphrase outside source control. Supply the
   passphrase only through gpg-agent or `MAVEN_GPG_PASSPHRASE`. For the `bc`
   signer, also supply `MAVEN_GPG_KEY`. Never use `-Dgpg.passphrase` or
   `settings.xml`, which `bestPractices` rejects.
@@ -476,6 +477,11 @@ Environment variables must be supplied securely and must never be written into
 the repository. CI secret handling, protected GitHub Environments, and the key
 rotation runbook are deferred — the first release is performed manually by the
 maintainer, so there is no CI holding publishing credentials to protect.
+
+**Result (2026-10-20):** portal token in `~/.m2/settings.xml` (server id
+`central`, mode 600); ed25519 key `1E7D14C37ABE8D6E5EDD0B05D0A31632E4C94CE3`,
+expires 2028-10-19, published to `keyserver.ubuntu.com` and retrievable by
+fingerprint.
 
 **Exit gate:** the maintainer can sign artifacts and authenticate to Central with
 no secret in any tracked file.
@@ -497,9 +503,9 @@ builds, signs, and bundles locally and skips both upload and publication. Pass
 it for the release candidate. Never document a bare `mvn deploy` as local
 validation.
 
-- [ ] Confirm the log explicitly reports that the upload was skipped and prints
+- [x] Confirm the log explicitly reports that the upload was skipped and prints
   the bundle path.
-- [ ] Inspect the generated bundle at:
+- [x] Inspect the generated bundle at:
 
 ```text
 target/central-publishing/central-bundle.zip
@@ -507,23 +513,29 @@ target/central-publishing/central-bundle.zip
 
   Configurable via the plugin's `outputFilename` (and the `forced*Directory`
   options).
-- [ ] Confirm the parent POM is present.
-- [ ] Confirm all nine approved JAR modules are present (run the G3 manifest
+- [x] Confirm the parent POM is present.
+- [x] Confirm all nine approved JAR modules are present (run the G3 manifest
   script).
-- [ ] Confirm `dedup4j-dashboard` is **absent**, and that skipping the last
+- [x] Confirm `dedup4j-dashboard` is **absent**, and that skipping the last
   reactor module does not suppress the bundle.
-- [ ] Confirm every published JAR has matching sources and Javadoc JARs.
-- [ ] Confirm every POM, JAR, and classifier has its detached `.asc` signature.
-- [ ] Confirm checksums exist and validate.
-- [ ] Verify at least one signature using the independently retrieved public key.
-- [ ] Inspect JAR contents for secrets, SQLite files, IDE files, test fixtures,
+- [x] Confirm every published JAR has matching sources and Javadoc JARs.
+- [x] Confirm every POM, JAR, and classifier has its detached `.asc` signature.
+- [x] Confirm checksums exist and validate.
+- [x] Verify at least one signature using the independently retrieved public key.
+- [x] Inspect JAR contents for secrets, SQLite files, IDE files, test fixtures,
   private configuration, or accidental executable nesting.
 - [~] Run `mvn help:effective-pom` for the parent and two representative
   children (one provider, one starter). Done on the snapshot (parent,
   `dedup4j-storage-s3`, `dedup4j-spring-boot-starter`); repeat at `0.1.0`.
 - [ ] Run a dependency vulnerability scan and review reachable high/critical
   findings. Block on genuinely relevant ones; do not build a formal
-  risk-acceptance process for a project with no users yet.
+  risk-acceptance process for a project with no users yet. Not run locally;
+  CI runs `dependency-review` on the release pull request.
+
+**Result (2026-10-20):** dry run at a temporary `0.1.0` (reverted). Bundle
+holds the parent and 9 artifacts, each with POM, JAR, sources and Javadoc;
+37/37 signatures verify against the keyserver key; checksums match; no
+secrets, databases, IDE files or test classes; `dedup4j-dashboard` absent.
 
 **Exit gate:** the exact signed bundle is locally inspectable, contains only the
 approved artifacts, and nothing in this gate uploads it.
@@ -536,20 +548,20 @@ keep. A reactor build proves almost nothing about an external consumer.
 Create disposable consumer projects **outside both repositories**. Do not rely on
 reactor resolution or a populated local Maven cache.
 
-- [ ] Build a Maven Spring Boot 4.1.x consumer depending only on
+- [x] Build a Maven Spring Boot 4.1.x consumer depending only on
   `io.github.heyedem:dedup4j-spring-boot-starter`.
-- [ ] Verify local-provider startup, schema initialization, store, duplicate
+- [x] Verify local-provider startup, schema initialization, store, duplicate
   store, retrieve, retain, and release.
-- [ ] Verify S3 and Azure configurations bind **without initializing the
+- [x] Verify S3 and Azure configurations bind **without initializing the
   unselected provider** — no credential discovery, no client construction. This
   is the core promise of ADR-007 and the most likely place for it to be false.
-- [ ] Verify `dedup4j-spring-boot-observability` transitively resolves the
+- [x] Verify `dedup4j-spring-boot-observability` transitively resolves the
   management and embedded-dashboard modules, and that the embedded dashboard's
   static resources and API route load.
-- [ ] Run a minimal **Gradle** consumer that resolves the same starter
+- [x] Run a minimal **Gradle** consumer that resolves the same starter
   coordinate and compiles. Resolution smoke test only; full functional parity is
   not required, but the site promises a Gradle snippet, so the snippet must work.
-- [ ] Use a fresh temporary local repository so no installed artifact can mask a
+- [x] Use a fresh temporary local repository so no installed artifact can mask a
   missing published parent or transitive module:
 
 ```bash
@@ -558,11 +570,19 @@ reactor resolution or a populated local Maven cache.
   clean verify
 ```
 
-- [ ] **The consumer project is the snippet test.** Its `pom.xml` and
+- [x] **The consumer project is the snippet test.** Its `pom.xml` and
   `build.gradle` dependency blocks must be byte-identical to
   `blob-helper-docs/src/docs/_includes/dep-maven.md` and `dep-gradle.md`. Copy in
   one direction only, from the verified consumer into the docs fragment.
-- [ ] Record exact commands and results for the release record.
+- [~] Record exact commands and results for the release record. Summarised
+  in the result note below; the raw logs sit in a temporary session scratch
+  directory and are not yet kept anywhere durable.
+
+**Result (2026-10-20):** Maven consumer (store, dedupe, `UploadHistory`
+totals), S3/Azure binding, observability starter and a Gradle consumer pass,
+resolving only from the bundle (19/19 files sha1-identical). Docs defects
+found: Azure minimal config fails without `endpoint` or `connection-string`;
+management routes are under `/v1`; site coordinates still `com.edem`.
 
 **Exit gate:** clean Maven and Gradle consumers resolve and exercise the public
 installation paths with no reactor access, and the documented snippets are the
