@@ -95,6 +95,17 @@ dedup4j:
 | `instance-name` | `dedup4j` |
 | `instance-id` | a random UUID per application start, the same id history rows use unless `dedup4j.history.instance-id` is set |
 
+The routes are versioned under `{base-path}/v1`. With the default base path:
+
+| Route | Returns |
+|---|---|
+| `GET /dedup4j/management/v1/metrics` | Upload and deduplication totals |
+| `GET /dedup4j/management/v1/info` | Instance id and name, storage provider, dataset id |
+| `GET /dedup4j/management/v1/health` | `UP` and a timestamp |
+| `GET /dedup4j/management/v1/failures` | Persisted upload failures |
+
+`/dedup4j/management/metrics`, without `/v1`, returns 404.
+
 `/metrics` now reports `datasetId`, `totalsScope` (`all-time` or
 `since-start`) and `physicalWrites` alongside the existing totals, and `/info`
 reports `datasetId`.
@@ -135,6 +146,11 @@ Note the default: **`enabled` is `true`**. Adding the dependency is the
 decision; the property is how you turn it back off. Same security caveat as
 above — read-only means it will not change your data, not that it is safe to
 expose.
+
+The page is served at `{base-path}` and reads its data from
+`{base-path}/api/v1`: `/overview`, `/instances/status`,
+`/instances/{id}/history` and `/failures`. With the default base path, that is
+`/dedup4j/dashboard/api/v1/overview` and so on.
 
 The embedded dashboard shows the history totals and the persisted failures
 even when the management endpoints are disabled. A caption under the headline
