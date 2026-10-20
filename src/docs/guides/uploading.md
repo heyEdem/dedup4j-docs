@@ -6,8 +6,6 @@ order: 5
 ---
 # Uploading & deduplication
 
---8<-- "not-on-central.md"
-
 `BlobStore` is the upload front door. It takes bytes in whatever form your
 application already has them and returns a `BlobReference`.
 

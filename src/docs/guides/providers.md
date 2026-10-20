@@ -6,8 +6,6 @@ order: 4
 ---
 # Storage providers
 
---8<-- "not-on-central.md"
-
 dedup4j ships three storage adapters and an SPI for writing your own. All
 three adapters arrive with the starter; **configuration selects one**, and the
 others stay inert.

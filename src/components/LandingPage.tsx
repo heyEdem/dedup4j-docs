@@ -5,8 +5,6 @@ import { MarkdownRenderer } from './MarkdownRenderer'
 
 const md = (s: string) => expandIncludes(s, includes)
 
-const NOT_ON_CENTRAL = md('--8<-- "not-on-central.md"')
-
 const INSTALL = md(
   [
     '::::tabs',
@@ -69,9 +67,6 @@ export function LandingPage() {
           </div>
           <div className="mt-10 max-w-2xl">
             <MarkdownRenderer body={INSTALL} fromId="" />
-          </div>
-          <div className="max-w-2xl">
-            <MarkdownRenderer body={NOT_ON_CENTRAL} fromId="" />
           </div>
         </div>
       </section>

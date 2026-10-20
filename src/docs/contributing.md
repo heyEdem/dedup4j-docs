@@ -6,8 +6,6 @@ order: 12
 ---
 # Contributing
 
---8<-- "not-on-central.md"
-
 dedup4j lives in two repositories:
 
 | Repository | Contains |

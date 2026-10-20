@@ -6,8 +6,6 @@ order: 6
 ---
 # Retrieval, retain & release
 
---8<-- "not-on-central.md"
-
 Deduplication means one stored object can serve many of your records. That
 raises a question the library has to answer: **when is content safe to
 delete?** dedup4j answers it with reference counting.

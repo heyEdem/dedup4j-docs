@@ -6,8 +6,6 @@ order: 9
 ---
 # Public API
 
---8<-- "not-on-central.md"
-
 The types dedup4j expects you to use. Everything here is in
 `com.edem.dedup4j.*`.
 

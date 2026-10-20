@@ -6,8 +6,6 @@ order: 8
 ---
 # Configuration properties
 
---8<-- "not-on-central.md"
-
 Every `dedup4j.*` property, its default, and whether it is honoured. Defaults
 are read from the property classes, not from documentation.
 

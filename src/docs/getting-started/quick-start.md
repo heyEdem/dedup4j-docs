@@ -6,8 +6,6 @@ order: 2
 ---
 # Quick start
 
---8<-- "not-on-central.md"
-
 Store a file, store the same bytes again and watch dedup4j recognise them,
 read the content back, then retain and release the reference. Everything here
 runs against the local filesystem provider and an embedded database — no cloud

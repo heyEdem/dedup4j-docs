@@ -6,8 +6,6 @@ order: 1
 ---
 # Installation
 
---8<-- "not-on-central.md"
-
 ## Requirements
 
 --8<-- "coordinates.md"

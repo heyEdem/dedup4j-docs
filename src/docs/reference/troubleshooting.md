@@ -6,8 +6,6 @@ order: 10
 ---
 # Troubleshooting
 
---8<-- "not-on-central.md"
-
 What each failure means and what to do about it.
 
 ## Exception hierarchy

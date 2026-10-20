@@ -6,8 +6,6 @@ order: 7
 ---
 # Observability & dashboards
 
---8<-- "not-on-central.md"
-
 Deduplication makes a claim — *you are storing less* — and a claim worth making
 is worth measuring. dedup4j exposes metrics, optional management endpoints, and
 two different dashboards for two different jobs.

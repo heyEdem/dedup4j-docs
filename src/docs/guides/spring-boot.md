@@ -6,8 +6,6 @@ order: 3
 ---
 # Spring Boot integration
 
---8<-- "not-on-central.md"
-
 The starter is designed to disappear: add the dependency, select a provider,
 and the beans exist. This page explains what it wires so that when you need to
 override something, you know what you are replacing.

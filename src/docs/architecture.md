@@ -6,8 +6,6 @@ order: 11
 ---
 # Architecture & limitations
 
---8<-- "not-on-central.md"
-
 What dedup4j is, how it is put together, and — more usefully — what it does
 not promise.
 
