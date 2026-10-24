@@ -107,6 +107,12 @@ file or server database, under `embedded` or `never`, apply the changelog
 yourself. It tracks itself in `DEDUP4J_HISTORY_DATABASE_CHANGELOG` and
 `DEDUP4J_HISTORY_DATABASE_CHANGELOG_LOCK`, separate from the asset changelog.
 
+### `Invalid dedup4j.deduplication.allowed-content-types entry '<entry>'`
+
+Each entry must be `type/subtype` or `type/*`. `*/*`, a bare type, an entry
+with parameters, and a blank entry from a trailing comma are all rejected. To
+allow every type, leave the property unset.
+
 ### No `BlobStorage` bean
 
 `dedup4j.storage.provider` is unset. It has no default — set it to `local`,
@@ -137,6 +143,13 @@ dedup4j:
 
 Content is read into memory to be hashed, so raising this raises peak memory
 per concurrent upload.
+
+### `BlobValidationException: Content type '<type>' is not allowed`
+
+`dedup4j.deduplication.allowed-content-types` is set, and the declared type is
+not on it, is missing, or is not a valid `type/subtype`. Nothing was read or
+stored. Check what your client sends. Browsers and `store(Path)` may send
+`application/octet-stream` for unknown files.
 
 ### `BlobValidationException: Could not open upload source`
 

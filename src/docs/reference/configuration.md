@@ -98,6 +98,16 @@ tables (`DEDUP4J_HISTORY_DATABASE_CHANGELOG` and `_LOCK`). See
 | Property | Default | Notes |
 |---|---|---|
 | `max-upload-size` | `25MB` | Larger uploads are rejected |
+| `allowed-content-types` | empty (all allowed) | From 0.2.0. `type/subtype` or `type/*` entries; other declared types are rejected |
+
+> [!NOTE]
+> **Only the declared content type is checked**
+>
+> `allowed-content-types` compares the type the client declares, ignoring
+> parameters such as `charset` and letter case. It does not inspect the
+> bytes. Once a list is set, an upload with no content type is rejected, and
+> `store(Path)` declares `application/octet-stream` when the type cannot be
+> probed. A malformed entry, such as `*/*` or `image/`, fails startup.
 
 > [!WARNING]
 > **Content is read into memory to be hashed**
