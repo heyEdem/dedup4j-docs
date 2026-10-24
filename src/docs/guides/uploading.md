@@ -33,6 +33,14 @@ holding.
 > enforced. Larger uploads are rejected. Raise it deliberately — the content
 > is read into memory to be hashed.
 
+> [!TIP]
+> **Restricting content types**
+>
+> From 0.2.0, `dedup4j.deduplication.allowed-content-types` limits uploads to
+> the declared types you list, for example `image/*, application/pdf`. A
+> rejected upload is not read or stored. It is empty by default, which allows
+> everything. See [Configuration](../reference/configuration.md#deduplication).
+
 > [!NOTE]
 > **The stream overload needs the size up front**
 >
