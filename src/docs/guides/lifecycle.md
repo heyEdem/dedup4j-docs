@@ -179,6 +179,48 @@ When repair is enabled, adjustments go through the same lock-aware
 reference-count service, and the caller must keep a transaction open for the
 duration.
 
+### Scheduled reports
+
+From 0.2.0 the starter can run the report for you. Register a
+`LogicalReferenceCountSource` bean and turn it on:
+
+```java
+@Bean
+LogicalReferenceCountSource logicalReferenceCountSource(DocumentRepository documents) {
+    return documents::countByContentId;   // Map<UUID, Long>
+}
+```
+
+```yaml
+dedup4j:
+  reconciliation:
+    enabled: true
+    cron: "0 0 3 * * *"
+    zone: UTC
+```
+
+Each run pages through dedup4j's content and reports:
+
+- **mismatches** — content whose stored count differs from yours;
+- **dangling references** — content IDs you count at least once that dedup4j
+  has no record of.
+
+Every one is counted; the first `sample-size` of each are kept and logged as
+`event=reconcile.mismatch` and `event=reconcile.dangling`. The run never
+writes. This needs no `ReconciliationService` bean.
+
+> [!IMPORTANT]
+> **Your source must be complete**
+>
+> A content ID missing from the map means "zero references", so a partial
+> answer reports correct content as drift. If your query fails, throw: the run
+> is recorded as failed and the next one tries again.
+
+Results go to logs, the `dedup4j.reconciliation.*` metrics (see
+[Observability](observability.md)) and the management API's
+`/v1/reconciliation`. Only the last run is kept, in memory, on the instance
+that ran it.
+
 ## Next
 
 - [Uploading & deduplication](uploading.md) — the store side

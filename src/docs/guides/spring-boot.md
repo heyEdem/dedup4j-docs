@@ -140,7 +140,7 @@ dedup4j:
   persistence:
     initialize-schema: embedded
   deduplication: { ... }
-  cleanup: { ... }
+  reconciliation: { ... }
 ```
 
 `provider` has no default. Omitting it means no storage adapter is

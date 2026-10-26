@@ -26,6 +26,9 @@ already uses.
 | `dedup4j.hashing` | content hashing timing |
 | `dedup4j.storage.delete.failures` | deletions that failed |
 | `dedup4j.repairs` | reconciliation repairs applied |
+| `dedup4j.reconciliation.runs` | scheduled reconciliation timing, tagged `outcome` = `success` or `failure` |
+| `dedup4j.reconciliation.mismatches` | mismatches found by the last successful scheduled run |
+| `dedup4j.reconciliation.dangling` | dangling references found by the last successful scheduled run |
 
 > [!TIP]
 > **The two that justify the library**
@@ -101,6 +104,7 @@ The routes are versioned under `{base-path}/v1`. With the default base path:
 | `GET /dedup4j/management/v1/info` | Instance id and name, storage provider, dataset id |
 | `GET /dedup4j/management/v1/health` | `UP` and a timestamp |
 | `GET /dedup4j/management/v1/failures` | Persisted upload failures |
+| `GET /dedup4j/management/v1/reconciliation` | Whether this instance runs scheduled reconciliation, its cron, and its last run (from 0.2.0) |
 
 `/dedup4j/management/metrics`, without `/v1`, returns 404.
 

@@ -122,6 +122,36 @@ tables (`DEDUP4J_HISTORY_DATABASE_CHANGELOG` and `_LOCK`). See
 > unconditional. Neither has a property, because neither is a choice the
 > library offers.
 
+## Reconciliation
+
+`dedup4j.reconciliation.*` — scheduled, read-only drift reports. From 0.2.0.
+
+| Property | Default | Notes |
+|---|---|---|
+| `enabled` | `false` | Requires one `LogicalReferenceCountSource` bean, or one marked `@Primary` |
+| `cron` | `0 0 3 * * *` | Spring six-field cron (seconds first) |
+| `zone` | JVM default | Time zone for `cron`, e.g. `UTC` |
+| `mode` | `report` | The only mode. `repair` fails startup |
+| `sample-size` | `100` | Mismatches and dangling references kept per run and logged; all are counted |
+
+> [!WARNING]
+> **Enable it on one instance**
+>
+> Instances are not coordinated. Every instance with `enabled=true` runs its
+> own pass against the shared database. Turn it on for one instance per
+> database, including during rolling deployments.
+
+> [!NOTE]
+> **Scheduled runs never repair**
+>
+> Your counts and dedup4j's are read at different moments, so an upload or
+> release in flight looks like drift. Repairing that automatically would
+> corrupt a correct count. Read the report, then call `repair` yourself — see
+> [Reconciliation](../guides/lifecycle.md#reconciliation).
+
+Startup fails when `enabled=true` and there is no source or more than one, or
+when `cron`, `zone`, `mode` or `sample-size` is invalid.
+
 ## Management
 
 `dedup4j.management.*` — requires `dedup4j-spring-boot-management`.

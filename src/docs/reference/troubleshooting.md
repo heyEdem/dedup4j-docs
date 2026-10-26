@@ -113,6 +113,26 @@ Each entry must be `type/subtype` or `type/*`. `*/*`, a bare type, an entry
 with parameters, and a blank entry from a trailing comma are all rejected. To
 allow every type, leave the property unset.
 
+### `dedup4j.reconciliation.enabled=true requires one LogicalReferenceCountSource bean, or one marked @Primary, found N`
+
+Scheduled reconciliation needs your counts. With `found 0`, register a
+`LogicalReferenceCountSource` bean. With `found 2` or more, mark one
+`@Primary` or remove the extras. See
+[Scheduled reports](../guides/lifecycle.md#scheduled-reports).
+
+### `dedup4j.reconciliation.enabled=true requires an EntityManagerFactory`
+
+Scheduled runs read through their own shared `EntityManager`, built from your
+`EntityManagerFactory`, so they never see stale rows. Expose the factory as a
+bean, or make sure your `EntityManager` returns it. With several factories, mark
+the one holding dedup4j's tables `@Primary`.
+
+### `Invalid dedup4j.reconciliation.cron` / `zone`
+
+`cron` is Spring's six-field format with seconds first: `0 0 3 * * *` is 03:00
+every day. `zone` takes an ID such as `UTC` or `Africa/Accra`.
+`mode=repair` also fails startup: scheduled runs only report.
+
 ### No `BlobStorage` bean
 
 `dedup4j.storage.provider` is unset. It has no default — set it to `local`,
@@ -211,8 +231,10 @@ storage permissions and reconcile.
 
 ### Reference counts disagree with your records
 
-Use `ReconciliationService` — but note it is **not auto-configured**, so you
-construct it yourself, and repair is off unless explicitly enabled. See
+To find drift on a schedule, set `dedup4j.reconciliation.enabled=true` and
+register a `LogicalReferenceCountSource`; runs only report. To repair, use
+`ReconciliationService` — it is **not auto-configured**, so you construct it
+yourself, and repair is off unless explicitly enabled. See
 [Reconciliation](../guides/lifecycle.md#reconciliation).
 
 Read a report before enabling repair. Automatic repair against a faulty

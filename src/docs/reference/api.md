@@ -242,6 +242,25 @@ public record ReconciliationReport(
 `LogicalReferenceCountSource` is a functional interface: you tell dedup4j what
 the counts *should* be, because it cannot enumerate your records.
 
+From 0.2.0, `ReconciliationService.summarize(source, pageSize, sampleLimit)`
+is the read-only pass scheduled runs use. It returns counts and bounded
+samples instead of every mismatch:
+
+```java
+public record ReconciliationSummary(
+    long checkedContentCount,
+    long mismatchCount,
+    long danglingReferenceCount,
+    List<ReconciliationMismatch> mismatchSample,
+    List<UUID> danglingReferenceSample
+) {}
+```
+
+`ScheduledReconciliation` is registered when `dedup4j.reconciliation.enabled`
+is true. `lastRun()` returns this instance's last `ReconciliationRun`
+(`startedAt`, `finishedAt`, `outcome`, and either `summary` or
+`failureType`/`failureMessage`); `runNow()` runs a pass immediately.
+
 ## Upload history
 
 `UploadHistory` (`com.edem.dedup4j.history`) is an auto-configured bean,
